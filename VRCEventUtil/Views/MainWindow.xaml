@@ -1,0 +1,202 @@
+﻿<Window
+    x:Class="VRCEventUtil.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+    xmlns:v="clr-namespace:VRCEventUtil.Views"
+    xmlns:vm="clr-namespace:VRCEventUtil.ViewModels"
+    xmlns:converter="clr-namespace:VRCEventUtil.Converters"
+    Title="VRChat Event Util"
+    Width="600" MinWidth="500"
+    Height="500" MinHeight="500"
+    WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
+    <behaviors:Interaction.Triggers>
+        <!--  When ContentRendered event raised, Initialize method of ViewModel would be called.  -->
+        <behaviors:EventTrigger EventName="ContentRendered">
+            <l:LivetCallMethodAction MethodName="Initialize" MethodTarget="{Binding}" />
+        </behaviors:EventTrigger>
+
+        <!--  Dispose method is called, when Window closing.  -->
+        <behaviors:EventTrigger EventName="Closed">
+            <l:DataContextDisposeAction />
+        </behaviors:EventTrigger>
+
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}" MessageKey="OpenFileDialog">
+            <l:OpenFileDialogInteractionMessageAction InvokeActionOnlyWhenWindowIsActive="False"/>
+        </l:InteractionMessageTrigger>
+
+        <!--  If you make user choose 'OK or Cancel' closing Window, then please use Window Close cancel Behavior.  -->
+
+    </behaviors:Interaction.Triggers>
+
+    <Window.Resources>
+        <converter:BoolInvertConverter x:Key="BoolInvertConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="100" MinHeight="100"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0"/>
+
+        <!--認証グリッド-->
+        <Grid Grid.Row="1" IsEnabled="{Binding IsLoggedIn, Converter={StaticResource BoolInvertConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0" Text="{Binding Username}" ToolTip="Username" VerticalContentAlignment="Center"/>
+            <TextBox Grid.Column="1" Text="{Binding Password}" ToolTip="Password" VerticalContentAlignment="Center"/>
+            <TextBox Grid.Column="2" Text="{Binding MFACode}" ToolTip="MFA Code" VerticalContentAlignment="Center"/>
+            <Button Grid.Column="3" Content="ログイン" Command="{Binding LoginCommand}"/>
+        </Grid>
+
+        <TabControl Grid.Row="2">
+            <!--<TabItem Header="インスタンス管理">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="20"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" DataContext="{Binding WorldInstanceManager, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding WorldId}" ToolTip="World ID" VerticalContentAlignment="Center"/>
+                        <Button Grid.Column="1" Content="インスタンス管理開始" Command="{Binding StartManagementCommand}"/>
+                    </Grid>
+
+                    <ListBox Grid.Row="1" ItemsSource="{Binding WorldInstanceManager.Instances}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Run Text="{Binding InstanceId}"/>
+                                    <Run Text="{Binding UserNum, StringFormat={}{0}人}"/>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StatusBar Grid.Row="2">
+                        <Button Content="" Width="100" Height="10"
+                                Visibility="{Binding WorldInstanceManager.IsManaging, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StatusBar>
+                </Grid>
+            </TabItem>-->
+
+            <TabItem Header="Invite">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBox Grid.Column="0" Text="{Binding WorldId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" ToolTip="ワールドID"/>
+                        <TextBlock Grid.Column="0" Text="例：wrld_ba913a96-fac4-4048-a062-9aa5db092812" VerticalAlignment="Center"
+                                   Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.WorldId, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.WorldId, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        
+                        <Button Grid.Column="1" Content="インスタンスを作成" Command="{Binding CreateWorldInstanceCommand}"/>
+                    </Grid>
+
+                    <TextBox Grid.Row="1" Text="{Binding InstanceId}" VerticalContentAlignment="Center" ToolTipService.ShowDuration="30000">
+                        <TextBox.ToolTip>
+                            <TextBlock>
+                                <Run Text="インスタンスID"/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run Text="「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．"/>
+                                <LineBreak/>
+                                <Run Text="すでに作成したインスタンスを用いる場合は，Webページからインスタンスを作成した際のURL"/>
+                                <LineBreak/>
+                                <Run Text="（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)）"/>
+                                <LineBreak/>
+                                <Run Text="または，ワールドID:インスタンスID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812:00000~region(jp)）の形式で入力してください．"/>
+                            </TextBlock>
+                        </TextBox.ToolTip>
+                    </TextBox>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding UserListFilePath}" IsReadOnly="True" VerticalContentAlignment="Center"/>
+                        <Button Grid.Column="1" Content="ファイルを選択" Command="{Binding SelectUserListFileCommand}"/>
+                    </Grid>
+
+                    <ListBox Grid.Row="3" ItemsSource="{Binding Users}" VirtualizingPanel.ScrollUnit="Pixel">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Run Text="{Binding Name}"/>
+                                    <Run Text="{Binding Id, StringFormat=({0})}"/>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Button Grid.Row="4" Content="Inviteを送信" Command="{Binding InviteCommand}"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch"/>
+
+        <ListBox Grid.Row="4" ItemsSource="{Binding Logs}" VirtualizingPanel.ScrollUnit="Pixel">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Time, StringFormat=HH:mm:ss}" Width="60"/>
+                        <TextBlock Text="{Binding Message}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StatusBar Grid.Row="5">
+            <ProgressBar Width="100" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        </StatusBar>
+    </Grid>
+</Window>
