@@ -10,9 +10,6 @@ namespace VRCEventUtil.Models
     {
         private const string LOG_DIR = "log";
 
-        private static string LogFileName => $"{DateTime.Now:yyyyMMdd}.csv";
-
-
         public static void Log(string msg, DateTime? dateTime = null)
         {
             dateTime ??= DateTime.Now;
@@ -20,7 +17,7 @@ namespace VRCEventUtil.Models
             try
             {
                 Directory.CreateDirectory(LOG_DIR);
-                File.AppendAllLines(LogFileName, contents, Encoding.UTF8);
+                File.AppendAllLines(CreateLogFileName(dateTime), contents, Encoding.UTF8);
             }
             catch (Exception)
             {

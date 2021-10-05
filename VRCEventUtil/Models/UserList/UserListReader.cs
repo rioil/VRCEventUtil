@@ -10,7 +10,7 @@ namespace VRCEventUtil.Models.UserList
 {
     public static class UserListReader
     {
-        public static List<User> Read(string filePath)
+        public static List<InviteUser> ReadInviteUser(string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -20,7 +20,7 @@ namespace VRCEventUtil.Models.UserList
             using (var reader = new StreamReader(filePath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                var records = csv.GetRecords<User>();
+                var records = csv.GetRecords<InviteUser>();
                 return records.ToList();
             }
         }

@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using io.github.vrchatapi.Model;
 using VRCEventUtil.Properties;
 using VRCEventUtil.Models.UserList;
+using System.Windows;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -27,8 +28,16 @@ namespace VRCEventUtil.ViewModels
         {
             IsLoading = true;
             Username = Settings.Default.Username;
-            Configuration.Default.Username = Username;
-            IsLoggedIn = await Task.Run(() => ApiManager.Instance.LoadAuthCookies());
+            ApiManager.Instance.ApiLog += msg => DispatcherHelper.UIDispatcher.Invoke(() => Log(msg));
+            IsLoggedIn = await Task.Run(() => ApiManager.Instance.Login(Username, null));
+            if (IsLoggedIn)
+            {
+                Log($"{Username}として自動ログインしました．");
+            }
+            else
+            {
+                Log($"自動ログインに失敗しました．ログインが必要です．");
+            }
             IsLoading = false;
         }
 
@@ -40,6 +49,11 @@ namespace VRCEventUtil.ViewModels
         /// インスタンス管理
         /// </summary>
         public WorldInstanceManager WorldInstanceManager { get; } = new WorldInstanceManager();
+
+        /// <summary>
+        /// インスタンス公開範囲列挙値リスト
+        /// </summary>
+        public List<EDisclosureRange> DisclosureRanges { get; } = Enum.GetValues(typeof(EDisclosureRange)).Cast<EDisclosureRange>().ToList();
         #endregion プロパティ
 
         #region 変更通知プロパティ
@@ -105,7 +119,13 @@ namespace VRCEventUtil.ViewModels
         public string WorldId
         {
             get => _worldId;
-            set => RaisePropertyChangedIfSet(ref _worldId, value);
+            set
+            {
+                if (RaisePropertyChangedIfSet(ref _worldId, value))
+                {
+                    CreateWorldInstanceCommand.RaiseCanExecuteChanged();
+                }
+            }
         }
         private string _worldId;
 
@@ -149,7 +169,14 @@ namespace VRCEventUtil.ViewModels
             {
                 if (RaisePropertyChangedIfSet(ref _userListFilePath, value))
                 {
-                    Users = new ObservableCollection<Models.UserList.User>(UserListReader.Read(value));
+                    Task.Run(() =>
+                    {
+                        var inviteUsers = UserListReader.ReadInviteUser(value);
+                        DispatcherHelper.UIDispatcher.Invoke(() =>
+                        {
+                            Users = new ObservableCollection<InviteUser>(inviteUsers);
+                        });
+                    });
                 }
             }
         }
@@ -158,12 +185,65 @@ namespace VRCEventUtil.ViewModels
         /// <summary>
         /// ユーザーリスト
         /// </summary>
-        public ObservableCollection<Models.UserList.User> Users
+        public ObservableCollection<InviteUser> Users
         {
             get => _users;
-            set => RaisePropertyChangedIfSet(ref _users, value);
+            set
+            {
+                if (RaisePropertyChangedIfSet(ref _users, value))
+                {
+                    InviteCommand.RaiseCanExecuteChanged();
+                    _users.CollectionChanged += (sender, args) => InviteCommand.RaiseCanExecuteChanged();
+                }
+            }
         }
-        private ObservableCollection<Models.UserList.User> _users;
+        private ObservableCollection<InviteUser> _users;
+
+        /// <summary>
+        /// インスタンスの公開範囲
+        /// </summary>
+        public EDisclosureRange InstanceDisclosureRange
+        {
+            get => _instanceDisclosureRange;
+            set => RaisePropertyChangedIfSet(ref _instanceDisclosureRange, value);
+        }
+        private EDisclosureRange _instanceDisclosureRange = EDisclosureRange.Invite;
+
+        /// <summary>
+        /// インスタンスのサーバー地域
+        /// </summary>
+        public ERegion InstanceRegion
+        {
+            get => _instanceRegion;
+            set => RaisePropertyChangedIfSet(ref _instanceRegion, value);
+        }
+        private ERegion _instanceRegion = ERegion.JP;
+
+        /// <summary>
+        /// Invite実行中か
+        /// </summary>
+        public bool IsInviting
+        {
+            get => _isInviting;
+            set
+            {
+                if (RaisePropertyChangedIfSet(ref _isInviting, value))
+                {
+                    InviteCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+        private bool _isInviting;
+
+        /// <summary>
+        /// Inviteの進捗度
+        /// </summary>
+        public int InviteProgress
+        {
+            get => _inviteProgress;
+            set => RaisePropertyChangedIfSet(ref _inviteProgress, value);
+        }
+        private int _inviteProgress;
         #endregion 変更通知プロパティ
 
         #region コマンド
@@ -174,28 +254,43 @@ namespace VRCEventUtil.ViewModels
         {
             if (await ApiManager.Instance.Login(Username, Password, MFACode))
             {
-                Log(ApiManager.Instance.CurrentUser.Username);
+                Log($"{Username}としてログインしました．");
                 Settings.Default.Username = Username;
                 Settings.Default.Save();
                 IsLoggedIn = true;
             }
             else
             {
-                // TODO 通知
+                Messenger.Raise(new InformationMessage("ログインに失敗しました．\nユーザー名，パスワード（必要であれば二要素認証コード）が正しいことを確認してください．",
+                    "エラー", MessageBoxImage.Warning, "InformationMessage"));
             }
         }
         private ViewModelCommand _loginCommand;
         public ViewModelCommand LoginCommand => _loginCommand ??= new ViewModelCommand(Login);
 
         /// <summary>
+        /// ログアウトを行います．
+        /// </summary>
+        public void Logout()
+        {
+            IsLoggedIn = false;
+            ApiManager.Instance.Logout();
+            Log("ログアウトしました．");
+        }
+        private ViewModelCommand _logoutCommand;
+        public ViewModelCommand LogoutCommand => _logoutCommand ??= new ViewModelCommand(Logout);
+
+        /// <summary>
         /// Invite送信処理を行います．
         /// </summary>
         public async void Invite()
         {
-            var userIds = Users.Select(user => user.Id).ToList();
-            var progress = new Progress<string>();
-            progress.ProgressChanged += (_, msg) => DispatcherHelper.UIDispatcher.Invoke(() => Log(msg));
-            var result = await ApiManager.Instance.Invite(InstanceId, userIds, progress);
+            InviteProgress = 0;
+            IsInviting = true;
+
+            var progress = new Progress<double>();
+            progress.ProgressChanged += (_, val) => DispatcherHelper.UIDispatcher.Invoke(() => InviteProgress = (int)val);
+            var result = await ApiManager.Instance.Invite(InstanceId, Users, progress);
             if (result)
             {
                 Log("Inviteに成功しました．");
@@ -204,9 +299,11 @@ namespace VRCEventUtil.ViewModels
             {
                 Log("Inviteに失敗しました．");
             }
+
+            IsInviting = false;
         }
 
-        public bool CanInvite() => !string.IsNullOrWhiteSpace(InstanceId);
+        public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(InstanceId) && Users.Any();
         private ViewModelCommand _inviteCommand;
         public ViewModelCommand InviteCommand => _inviteCommand ??= new ViewModelCommand(Invite, CanInvite);
 
@@ -215,10 +312,15 @@ namespace VRCEventUtil.ViewModels
         /// </summary>
         public async void CreateWorldInstance()
         {
-            InstanceId = await ApiManager.Instance.CreateWorldInstance(WorldId);
-            Log($"インスタンスを作成しました．\nID:{InstanceId}");
+            InstanceId = await ApiManager.Instance.CreateWorldInstance(WorldId, InstanceRegion, InstanceDisclosureRange);
+            var instanceId = ApiUtil.ParseLocationId(InstanceId).InstanceId;
+            Log($"インスタンスを作成しました．\n" +
+                $"サーバー地域：{InstanceRegion} 公開範囲：{InstanceDisclosureRange}\n" +
+                $"ワールドID：{WorldId}\n" +
+                $"インスタンスID：{instanceId}");
         }
-        public ViewModelCommand CreateWorldInstanceCommand => _createWorldInstanceCommand ??= new ViewModelCommand(CreateWorldInstance);
+        public bool CanCreateWorldInstance() => !string.IsNullOrWhiteSpace(WorldId);
+        public ViewModelCommand CreateWorldInstanceCommand => _createWorldInstanceCommand ??= new ViewModelCommand(CreateWorldInstance, CanCreateWorldInstance);
         private ViewModelCommand _createWorldInstanceCommand;
 
         /// <summary>
@@ -233,13 +335,23 @@ namespace VRCEventUtil.ViewModels
             };
             Messenger.Raise(dialog);
 
-            if (dialog.Response.Any())
+            if (dialog.Response is object && dialog.Response.Any())
             {
                 UserListFilePath = dialog.Response[0];
             }
         }
         private ViewModelCommand _selectUserListFileCommand;
         public ViewModelCommand SelectUserListFileCommand => _selectUserListFileCommand ??= new ViewModelCommand(SelectUserListFile);
+
+        /// <summary>
+        /// ログをクリアします．
+        /// </summary>
+        public void ClaerLog()
+        {
+            Logs.Clear();
+        }
+        private ViewModelCommand _claerLogCommand;
+        public ViewModelCommand ClaerLogCommand => _claerLogCommand ??= new ViewModelCommand(ClaerLog);
 
         #endregion コマンド
 

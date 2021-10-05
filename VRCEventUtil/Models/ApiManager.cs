@@ -12,6 +12,9 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Collections.Concurrent;
+using VRCEventUtil.Models.UserList;
+using System.ComponentModel;
+using VRCEventUtil.Converters;
 
 namespace VRCEventUtil.Models
 {
@@ -75,40 +78,24 @@ namespace VRCEventUtil.Models
         public CurrentUser CurrentUser { get; private set; }
         #endregion プロパティ
 
-        #region メソッド
+        #region イベント
         /// <summary>
-        /// 保存された認証Cookieを読み込んで，接続を試行します．
+        /// 
         /// </summary>
-        /// <returns>接続に成功すればtrue</returns>
-        public async Task<bool> LoadAuthCookies()
-        {
-            _authApi = new AuthenticationApi();
+        public event Action<string> ApiLog;
+        #endregion イベント
 
-            try
-            {
-                var authCookie = new Cookie("auth", Settings.Default.AuthCookie, "/", API_DOMAIN);
-                var mfaCookie = new Cookie("twoFactorAuth", Settings.Default.MFACookie, "/", API_DOMAIN);
-                _authApi.Configuration.ApiClient.RestClient.CookieContainer.Add(authCookie);
-                _authApi.Configuration.ApiClient.RestClient.CookieContainer.Add(mfaCookie);
-                CurrentUser = await _authApi.GetCurrentUserAsync();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-
-            return true;
-        }
-
+        #region メソッド
         public async Task<bool> Login(string username, string password, string mfaCode = null)
         {
+            Configuration.Default.Username = username;
+
             if (await LoadAuthCookies())
             {
                 return true;
             }
 
-            Configuration.Default.Username = username;
+            ClearAuthSettings();
             Configuration.Default.Password = password;
             _authApi = new AuthenticationApi();
 
@@ -133,13 +120,20 @@ namespace VRCEventUtil.Models
             return true;
         }
 
+        public void Logout()
+        {
+            _authApi.Logout();
+            ClearAuthSettings();
+            Configuration.Default.Password = string.Empty;
+        }
+
         /// <summary>
         /// Inviteを実行します．
         /// </summary>
-        /// <param name="instanceId"></param>
-        /// <param name="userIds"></param>
+        /// <param name="locationId"></param>
+        /// <param name="users"></param>
         /// <returns></returns>
-        public async Task<bool> Invite(string instanceId, IEnumerable<string> userIds, IProgress<string> progress)
+        public async Task<bool> Invite(string locationId, IEnumerable<InviteUser> users, IProgress<double> progress)
         {
             return await Task.Run(async () =>
             {
@@ -147,7 +141,7 @@ namespace VRCEventUtil.Models
                 string formattedInstanceId;
                 try
                 {
-                    formattedInstanceId = ApiUtil.ConvertToLocationId(instanceId);
+                    formattedInstanceId = ApiUtil.ConvertToLocationId(locationId);
                 }
                 catch (Exception ex) when (ex is FormatException || ex is ArgumentNullException)
                 {
@@ -159,24 +153,66 @@ namespace VRCEventUtil.Models
                 var inviteRequest = new InviteRequest(formattedInstanceId);
 
                 // Invite実行
-                for (int i = 0; i < userIds.Count(); i++)
+                int userCount = 0;
+                foreach (var user in users)
                 {
-                    var userId = userIds.ElementAt(i);
-                    if (!await Invite(userId, apiInstance, inviteRequest))
+                    try
                     {
-                        // TODO
-                        return false;
+                        // 状態をリセット
+                        user.IsInWorld = false;
+                        user.HasInvited = false;
+                        user.IsLocationCheckScheduled = false;
+
+                        // ユーザーのいるインスタンスを確認
+                        var userInfo = GetUserInfo(user.Id);
+                        var loc = userInfo.Location;
+                        if (loc == "offline")
+                        {
+                            DispatcherHelper.UIDispatcher.Invoke(() =>
+                            {
+                                user.IsOnline = false;
+                            });
+                            continue;
+                        }
+
+                        DispatcherHelper.UIDispatcher.Invoke(() => user.IsOnline = true);
+                        if (loc == locationId)
+                        {
+                            DispatcherHelper.UIDispatcher.Invoke(() => user.IsInWorld = true);
+                            continue;
+                        }
+
+                        if (!await Invite(user.Id, apiInstance, inviteRequest))
+                        {
+                            // TODO
+                            return false;
+                        }
+
+                        ApiLog?.Invoke($"{user.Name}にInviteを送信しました．");
+                        DispatcherHelper.UIDispatcher.Invoke(() =>
+                        {
+                            user.HasInvited = true;
+                            user.IsLocationCheckScheduled = true;
+                        });
                     }
-                    progress.Report($"{userId}にInviteを送信しました．");
+                    finally
+                    {
+                        progress.Report((double)++userCount / users.Count() * 100);
+                    }
                 }
 
                 return true;
             });
         }
 
+        /// <summary>
+        /// ユーザー情報を取得します．
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public User GetUserInfo(string userId)
         {
-            var apiInstance = new UsersApi(Configuration.Default);
+            var apiInstance = new UsersApi(_authApi.Configuration);
 
             try
             {
@@ -190,9 +226,14 @@ namespace VRCEventUtil.Models
             }
         }
 
+        /// <summary>
+        /// ワールド情報を取得します．
+        /// </summary>
+        /// <param name="worldId"></param>
+        /// <returns></returns>
         public World GetWorldInfo(string worldId)
         {
-            var apiInstance = new WorldsApi(Configuration.Default);
+            var apiInstance = new WorldsApi(_authApi.Configuration);
 
             try
             {
@@ -206,16 +247,23 @@ namespace VRCEventUtil.Models
             }
         }
 
-        public async Task<string> CreateWorldInstance(string worldId)
+        /// <summary>
+        /// ワールドのインスタンスを作成します．
+        /// </summary>
+        /// <param name="worldId"></param>
+        /// <param name="region"></param>
+        /// <param name="disclosureRange"></param>
+        /// <returns></returns>
+        public async Task<string> CreateWorldInstance(string worldId, ERegion region = ERegion.JP, EDisclosureRange disclosureRange = EDisclosureRange.Invite)
         {
             return await Task.Run(async () =>
             {
                 try
                 {
                     WaitApiCallInterval();
-                    var user = await new UsersApi(Configuration.Default).GetUserByNameAsync(Configuration.Default.Username);
+                    var user = await new UsersApi(_authApi.Configuration).GetUserByNameAsync(_authApi.Configuration.Username);
                     var userId = user.Id;
-                    var instanceId = CreateNewLocationId(worldId, userId, ERegion.JP, EDisclosureRange.FriendPlus);
+                    var instanceId = CreateNewLocationId(worldId, userId, region, disclosureRange);
 
                     return instanceId;
                 }
@@ -227,6 +275,11 @@ namespace VRCEventUtil.Models
             });
         }
 
+        /// <summary>
+        /// ワールドのインスタンスの情報を取得します．
+        /// </summary>
+        /// <param name="locationId"></param>
+        /// <returns></returns>
         public Instance GetWorldInstance(string locationId)
         {
             string worldId;
@@ -245,9 +298,15 @@ namespace VRCEventUtil.Models
             return GetWorldInstance(worldId, instanceId);
         }
 
+        /// <summary>
+        /// ワールドのインスタンスの情報を取得します．
+        /// </summary>
+        /// <param name="worldId"></param>
+        /// <param name="instanceId"></param>
+        /// <returns></returns>
         public Instance GetWorldInstance(string worldId, string instanceId)
         {
-            var apiInstance = new WorldsApi();
+            var apiInstance = new WorldsApi(_authApi.Configuration);
 
             try
             {
@@ -263,11 +322,51 @@ namespace VRCEventUtil.Models
         #endregion メソッド
 
         #region 内部関数
+        /// <summary>
+        /// API呼び出し間隔制限を守るように処理を待ちます．
+        /// </summary>
         private void WaitApiCallInterval()
         {
             var e = new CountdownEvent(1);
             _apiCallRequests.Add(e);
             e.Wait();
+        }
+
+        /// <summary>
+        /// 保存された認証Cookieを読み込んで，接続を試行します．
+        /// </summary>
+        /// <returns>接続に成功すればtrue</returns>
+        private async Task<bool> LoadAuthCookies()
+        {
+            _authApi = new AuthenticationApi();
+
+            var authCookieVal = Settings.Default.AuthCookie;
+            var mfaCookieVal = Settings.Default.MFACookie;
+            if (string.IsNullOrWhiteSpace(authCookieVal))
+            {
+                return false;
+            }
+
+            try
+            {
+                var authCookie = new Cookie("auth", authCookieVal, "/", API_DOMAIN);
+                _authApi.Configuration.ApiClient.RestClient.CookieContainer.Add(authCookie);
+
+                if (!string.IsNullOrWhiteSpace(mfaCookieVal))
+                {
+                    var mfaCookie = new Cookie("twoFactorAuth", mfaCookieVal, "/", API_DOMAIN);
+                    _authApi.Configuration.ApiClient.RestClient.CookieContainer.Add(mfaCookie);
+                }
+
+                CurrentUser = await _authApi.GetCurrentUserAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -284,6 +383,14 @@ namespace VRCEventUtil.Models
             Settings.Default.Save();
         }
 
+        /// <summary>
+        /// 新しいLocation IDを作成します．
+        /// </summary>
+        /// <param name="worldId"></param>
+        /// <param name="userId"></param>
+        /// <param name="region"></param>
+        /// <param name="disclosureRange"></param>
+        /// <returns></returns>
         private string CreateNewLocationId(string worldId, string userId, ERegion region, EDisclosureRange disclosureRange)
         {
             // :(\d+)(~region\(([\w]+)\))?(~([\w]+)\(usr_([\w-]+)\)((\~canRequestInvite)?)(~region\(([\w].+)\))?~nonce\((.+)\))?
@@ -292,10 +399,10 @@ namespace VRCEventUtil.Models
             string disclosureRangeStr = string.Empty;
             switch (disclosureRange)
             {
-                case EDisclosureRange.FriendPlus:
+                case EDisclosureRange.FriendsPlus:
                     disclosureRangeStr = $"~hidden({userId})";
                     break;
-                case EDisclosureRange.Friend:
+                case EDisclosureRange.Friends:
                     disclosureRangeStr = $"~friends({userId})";
                     break;
                 case EDisclosureRange.InvitePlus:
@@ -314,6 +421,13 @@ namespace VRCEventUtil.Models
             return location;
         }
 
+        /// <summary>
+        /// Inviteを送信します．
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="apiInstance"></param>
+        /// <param name="inviteRequest"></param>
+        /// <returns></returns>
         private async Task<bool> Invite(string userId, InviteApi apiInstance, InviteRequest inviteRequest)
         {
             try
@@ -333,9 +447,22 @@ namespace VRCEventUtil.Models
                 return false;
             }
         }
+
+        /// <summary>
+        /// 設定ファイルに保存された認証情報をクリアします．
+        /// </summary>
+        private void ClearAuthSettings()
+        {
+            Settings.Default.AuthCookie = null;
+            Settings.Default.MFACookie = null;
+            Settings.Default.Save();
+        }
         #endregion 内部関数
     }
 
+    /// <summary>
+    /// インスタンスのサーバー地域
+    /// </summary>
     public enum ERegion
     {
         US,
@@ -343,12 +470,21 @@ namespace VRCEventUtil.Models
         JP,
     }
 
+    /// <summary>
+    /// インスタンスの公開範囲
+    /// </summary>
+    [TypeConverter(typeof(EnumDisplayNameConverter))]
     public enum EDisclosureRange
     {
+        [EnumDisplayName("Public")]
         Public,
-        FriendPlus,
-        Friend,
+        [EnumDisplayName("Friends+")]
+        FriendsPlus,
+        [EnumDisplayName("Friends Only")]
+        Friends,
+        [EnumDisplayName("Invite+")]
         InvitePlus,
+        [EnumDisplayName("Invite Only")]
         Invite,
     }
 }
