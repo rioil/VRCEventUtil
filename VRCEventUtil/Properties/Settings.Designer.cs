@@ -70,5 +70,17 @@ namespace VRCEventUtil.Properties {
                 this["APICallInterval"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NoVRMode {
+            get {
+                return ((bool)(this["NoVRMode"]));
+            }
+            set {
+                this["NoVRMode"] = value;
+            }
+        }
     }
 }

@@ -171,9 +171,23 @@
                                     <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Text="{Binding WorldId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" ToolTip="ワールドID"/>
+                                <TextBox Grid.Column="0" Text="{Binding WorldId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                         ToolTipService.ShowDuration="30000" >
+                                    <TextBox.ToolTip>
+                                        <TextBlock>
+                                            <Run Text="ワールドID/ワールドURL"/>
+                                            <LineBreak/>
+                                            <LineBreak/>
+                                            <Run Text="ワールドID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812）または，"/>
+                                            <LineBreak/>
+                                            <Run Text="ワールドURL（例：https://vrchat.com/home/world/wrld_ba913a96-fac4-4048-a062-9aa5db092812）"/>
+                                            <LineBreak/>
+                                            <Run Text="のいずれかの形式で入力してください．"/>
+                                        </TextBlock>
+                                    </TextBox.ToolTip>
+                                </TextBox>
                                 <TextBlock Grid.Column="0" Text="例：wrld_ba913a96-fac4-4048-a062-9aa5db092812" VerticalAlignment="Center"
-                                   Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
+                                           Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Visibility" Value="Hidden"/>
@@ -195,23 +209,52 @@
                             </Grid>
 
                             <TextBlock Grid.Row="2" Text="インスタンスID" VerticalAlignment="Center"/>
-                            <TextBox Grid.Row="3" Text="{Binding InstanceId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
-                                     ToolTipService.ShowDuration="30000" Height="25">
-                                <TextBox.ToolTip>
-                                    <TextBlock>
-                                <Run Text="インスタンスID"/>
-                                <LineBreak/>
-                                <LineBreak/>
-                                <Run Text="「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．"/>
-                                <LineBreak/>
-                                <Run Text="すでに作成したインスタンスを用いる場合は，Webページからインスタンスを作成した際のURL"/>
-                                <LineBreak/>
-                                <Run Text="（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)）"/>
-                                <LineBreak/>
-                                <Run Text="または，ワールドID:インスタンスID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812:00000~region(jp)）の形式で入力してください．"/>
-                                    </TextBlock>
-                                </TextBox.ToolTip>
-                            </TextBox>
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox Grid.Column="0" Text="{Binding InstanceId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                         ToolTipService.ShowDuration="30000" Height="25">
+                                    <TextBox.ToolTip>
+                                        <TextBlock>
+                                            <Run Text="インスタンスID/インスタンスURL"/>
+                                            <LineBreak/>
+                                            <LineBreak/>
+                                            <Run Text="「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．"/>
+                                            <LineBreak/>
+                                            <LineBreak/>
+                                            <Run Text="インスタンスURL（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)）"/>
+                                            <LineBreak/>
+                                            <Run Text="または，ワールドID:インスタンスID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812:00000~region(jp)）のいずれかの形式で入力してください．"/>
+                                        </TextBlock>
+                                    </TextBox.ToolTip>
+                                </TextBox>
+                                <TextBlock Grid.Column="0" Text="例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)" VerticalAlignment="Center"
+                                           Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Hidden"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.InstanceId, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding DataContext.InstanceId, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <Button Grid.Column="1" Command="{Binding OpenInVRChatCommand}">
+                                    <Border Background="Transparent" ToolTip="VRChatで開く">
+                                        <Path Data="{StaticResource OpenIcon}" Fill="{StaticResource DefaultIconColorBrush}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="4"/>
+                                    </Border>
+                                </Button>
+                            </Grid>
                         </Grid>
                     </GroupBox>
 

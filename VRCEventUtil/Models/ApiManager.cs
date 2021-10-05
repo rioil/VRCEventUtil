@@ -252,14 +252,17 @@ namespace VRCEventUtil.Models
         /// <summary>
         /// ワールドのインスタンスを作成します．
         /// </summary>
-        /// <param name="worldId"></param>
+        /// <param name="worldIdOrUrl"></param>
         /// <param name="region"></param>
         /// <param name="disclosureRange"></param>
         /// <returns></returns>
-        public async Task<string> CreateWorldInstance(string worldId, ERegion region = ERegion.JP, EDisclosureRange disclosureRange = EDisclosureRange.Invite)
+        /// <exception cref="FormatException"></exception>
+        public async Task<string> CreateWorldInstance(string worldIdOrUrl, ERegion region = ERegion.JP, EDisclosureRange disclosureRange = EDisclosureRange.Invite)
         {
             return await Task.Run(async () =>
             {
+                var worldId = ApiUtil.ParseWorldId(worldIdOrUrl);
+
                 try
                 {
                     WaitApiCallInterval();
@@ -289,7 +292,7 @@ namespace VRCEventUtil.Models
 
             try
             {
-                (worldId, instanceId) = ApiUtil.ParseLocationId(locationId);
+                (worldId, instanceId) = ApiUtil.ResolveLocationId(locationId);
             }
             catch (FormatException ex)
             {

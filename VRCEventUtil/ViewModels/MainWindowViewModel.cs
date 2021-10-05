@@ -19,6 +19,8 @@ using VRCEventUtil.Properties;
 using VRCEventUtil.Models.UserList;
 using System.Windows;
 using System.Threading;
+using System.Collections;
+using System.Diagnostics;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -43,6 +45,11 @@ namespace VRCEventUtil.ViewModels
         }
 
         #region メンバ変数
+        /// <summary>
+        /// エラー
+        /// </summary>
+        private readonly Dictionary<string, List<string>> _currentErrors = new Dictionary<string, List<string>>();
+
         /// <summary>
         /// Invite中断用キャンセルトークンソース
         /// </summary>
@@ -358,8 +365,18 @@ namespace VRCEventUtil.ViewModels
         /// </summary>
         public async void CreateWorldInstance()
         {
-            InstanceId = await ApiManager.Instance.CreateWorldInstance(WorldId, InstanceRegion, InstanceDisclosureRange);
-            var instanceId = ApiUtil.ParseLocationId(InstanceId).InstanceId;
+            try
+            {
+                InstanceId = await ApiManager.Instance.CreateWorldInstance(WorldId, InstanceRegion, InstanceDisclosureRange);
+            }
+            catch (FormatException)
+            {
+                Log("ワールドIDの形式が正しくありません．");
+                Messenger.Raise(new InformationMessage("ワールドIDの形式が正しくありません．", "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                return;
+            }
+
+            var instanceId = ApiUtil.ResolveLocationId(InstanceId).InstanceId;
             Log($"インスタンスを作成しました．\n" +
                 $"サーバー地域：{InstanceRegion} 公開範囲：{InstanceDisclosureRange}\n" +
                 $"ワールドID：{WorldId}\n" +
@@ -399,7 +416,40 @@ namespace VRCEventUtil.ViewModels
         private ViewModelCommand _claerLogCommand;
         public ViewModelCommand ClaerLogCommand => _claerLogCommand ??= new ViewModelCommand(ClaerLog);
 
+
+
+        public void OpenInVRChat()
+        {
+            if (!ApiUtil.TryParseLocationIdOrUrl(InstanceId, out var locationId))
+            {
+                Log("インスタンスIDの形式が正しくありません．");
+                Messenger.Raise(new InformationMessage("インスタンスIDの形式が正しくありません．", "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                return;
+            }
+
+            var processInfo = new ProcessStartInfo("cmd.exe",
+                $"/c start=vrchat://launch?id={locationId}{(Settings.Default.NoVRMode ? " --no-vr" : string.Empty)}")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+
+            try
+            {
+                Process.Start(processInfo);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
+        private ViewModelCommand _openInVRChatCommand;
+        public ViewModelCommand OpenInVRChatCommand => _openInVRChatCommand ??= new ViewModelCommand(OpenInVRChat);
+
         #endregion コマンド
+
+        #region メソッド
+        #endregion メソッド
 
         #region 内部関数
         private void Log(string msg)

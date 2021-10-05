@@ -14,5 +14,8 @@
     <Setting Name="APICallInterval" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:05</Value>
     </Setting>
+    <Setting Name="NoVRMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
