@@ -4,10 +4,11 @@ using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace VRCEventUtil.Converters
 {
-    class BoolToVisibilityConverter : IValueConverter
+    class BoolToVisibilityConverter : MarkupExtension, IValueConverter
     {
         /// <summary>
         /// Trueの時のVisibilityの値
@@ -39,6 +40,11 @@ namespace VRCEventUtil.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
         }
     }
 }

@@ -6,6 +6,7 @@
     xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
     xmlns:v="clr-namespace:VRCEventUtil.Views"
     xmlns:vm="clr-namespace:VRCEventUtil.ViewModels"
+    xmlns:conv="clr-namespace:VRCEventUtil.Converters"
     xmlns:m="clr-namespace:VRCEventUtil.Models"
     xmlns:userlist="clr-namespace:VRCEventUtil.Models.UserList"
     Title="VRChat Event Util"
@@ -478,8 +479,8 @@
 
         <!--ステータスバー-->
         <StatusBar Grid.Row="4">
-            <ProgressBar Width="100" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"/>
-            <ProgressBar Width="100" Height="10" Value="{Binding InviteProgress}" Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ProgressBar Width="100" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}"/>
+            <ProgressBar Width="100" Height="10" Value="{Binding InviteProgress}" Visibility="{Binding IsInviting, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}">
                 <ProgressBar.ToolTip>
                     <TextBlock Text="{Binding InviteProgress, StringFormat=Invite送信中：{0}%}"/>
                 </ProgressBar.ToolTip>
