@@ -21,7 +21,13 @@ namespace VRCEventUtil.Models.UserList
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 var records = csv.GetRecords<InviteUser>();
-                return records.ToList();
+                var distinctedRecords = records.Distinct(new InviteUserComparer()).ToList();
+                if (records.Count() != distinctedRecords.Count)
+                {
+                    Logger.Log($"ユーザーリストファイル {filePath} 読み込み時に，{records.Count() - distinctedRecords.Count}件の重複データを削除しました．");
+                }
+
+                return distinctedRecords;
             }
         }
     }

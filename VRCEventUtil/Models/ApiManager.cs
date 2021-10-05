@@ -30,7 +30,6 @@ namespace VRCEventUtil.Models
         {
             _lastApiCallTime = DateTime.Now;
 
-            TimeSpan MIN_INTERVAL = TimeSpan.FromSeconds(5);
             var token = _tokenSource.Token;
             _apiCallRequestTask = Task.Run(async () =>
             {
@@ -41,6 +40,7 @@ namespace VRCEventUtil.Models
                         var interval = DateTime.Now - _lastApiCallTime;
                         Logger.Log($"スレッド{Thread.CurrentThread.ManagedThreadId}:前回のAPI呼び出しからの経過時間は{interval}です．");
 
+                        TimeSpan MIN_INTERVAL = Settings.Default.APICallInterval;
                         if (interval < MIN_INTERVAL)
                         {
                             await Task.Delay(MIN_INTERVAL - interval);
@@ -132,8 +132,11 @@ namespace VRCEventUtil.Models
         /// </summary>
         /// <param name="locationId"></param>
         /// <param name="users"></param>
+        /// <param name="progress"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> Invite(string locationId, IEnumerable<InviteUser> users, IProgress<double> progress)
+        /// <exception cref="TaskCanceledException"></exception>
+        public async Task<bool> Invite(string locationId, IEnumerable<InviteUser> users, IProgress<double> progress, CancellationToken cancellationToken)
         {
             return await Task.Run(async () =>
             {
@@ -158,42 +161,41 @@ namespace VRCEventUtil.Models
                 {
                     try
                     {
+                        if (cancellationToken.IsCancellationRequested) { return false; }
+
                         // 状態をリセット
                         user.IsInWorld = false;
                         user.HasInvited = false;
                         user.IsLocationCheckScheduled = false;
 
                         // ユーザーのいるインスタンスを確認
-                        var userInfo = GetUserInfo(user.Id);
+                        var userInfo = await GetUserInfo(user.Id, cancellationToken);
+                        user.Name = userInfo.DisplayName;
+
                         var loc = userInfo.Location;
                         if (loc == "offline")
                         {
-                            DispatcherHelper.UIDispatcher.Invoke(() =>
-                            {
-                                user.IsOnline = false;
-                            });
+                            user.IsOnline = false;
                             continue;
                         }
 
-                        DispatcherHelper.UIDispatcher.Invoke(() => user.IsOnline = true);
+                        user.IsOnline = true;
                         if (loc == locationId)
                         {
-                            DispatcherHelper.UIDispatcher.Invoke(() => user.IsInWorld = true);
+                            user.IsInWorld = true;
                             continue;
                         }
 
-                        if (!await Invite(user.Id, apiInstance, inviteRequest))
+                        if (cancellationToken.IsCancellationRequested) { return false; }
+                        if (!await Invite(user.Id, apiInstance, inviteRequest, cancellationToken))
                         {
                             // TODO
                             return false;
                         }
 
                         ApiLog?.Invoke($"{user.Name}にInviteを送信しました．");
-                        DispatcherHelper.UIDispatcher.Invoke(() =>
-                        {
-                            user.HasInvited = true;
-                            user.IsLocationCheckScheduled = true;
-                        });
+                        user.HasInvited = true;
+                        user.IsLocationCheckScheduled = true;
                     }
                     finally
                     {
@@ -202,7 +204,7 @@ namespace VRCEventUtil.Models
                 }
 
                 return true;
-            });
+            }, cancellationToken);
         }
 
         /// <summary>
@@ -210,14 +212,14 @@ namespace VRCEventUtil.Models
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public User GetUserInfo(string userId)
+        public async Task<User> GetUserInfo(string userId, CancellationToken cancellationToken)
         {
             var apiInstance = new UsersApi(_authApi.Configuration);
 
             try
             {
                 WaitApiCallInterval();
-                return apiInstance.GetUser(userId);
+                return await apiInstance.GetUserAsync(userId, cancellationToken);
             }
             catch (ApiException ex)
             {
@@ -427,13 +429,15 @@ namespace VRCEventUtil.Models
         /// <param name="userId"></param>
         /// <param name="apiInstance"></param>
         /// <param name="inviteRequest"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> Invite(string userId, InviteApi apiInstance, InviteRequest inviteRequest)
+        /// <exception cref="TaskCanceledException"></exception>
+        private async Task<bool> Invite(string userId, InviteApi apiInstance, InviteRequest inviteRequest, CancellationToken cancellationToken)
         {
             try
             {
                 WaitApiCallInterval();
-                var result = await apiInstance.InviteUserAsync(userId, inviteRequest);
+                var result = await apiInstance.InviteUserAsync(userId, inviteRequest, cancellationToken);
                 return true;
             }
             catch (ApiException ex) when (ex.ErrorCode == 500)  // WARNING:Inviteが成功してもレスポンスの解析で500番エラーが発生するのでログだけ出して無視する

@@ -11,5 +11,8 @@
     <Setting Name="MFACookie" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="APICallInterval" Type="System.TimeSpan" Scope="User">
+      <Value Profile="(Default)">00:00:05</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

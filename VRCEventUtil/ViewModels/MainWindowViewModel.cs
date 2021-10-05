@@ -18,6 +18,7 @@ using io.github.vrchatapi.Model;
 using VRCEventUtil.Properties;
 using VRCEventUtil.Models.UserList;
 using System.Windows;
+using System.Threading;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -42,6 +43,10 @@ namespace VRCEventUtil.ViewModels
         }
 
         #region メンバ変数
+        /// <summary>
+        /// Invite中断用キャンセルトークンソース
+        /// </summary>
+        CancellationTokenSource _inviteCancellationTokenSrc;
         #endregion メンバ変数
 
         #region プロパティ
@@ -230,10 +235,27 @@ namespace VRCEventUtil.ViewModels
                 if (RaisePropertyChangedIfSet(ref _isInviting, value))
                 {
                     InviteCommand.RaiseCanExecuteChanged();
+                    AbortInviteCommand.RaiseCanExecuteChanged();
                 }
             }
         }
         private bool _isInviting;
+
+        /// <summary>
+        /// Inviteをキャンセル中か
+        /// </summary>
+        public bool IsInviteAborting
+        {
+            get => _IsInviteCancelling;
+            set
+            {
+                if (RaisePropertyChangedIfSet(ref _IsInviteCancelling, value))
+                {
+                    AbortInviteCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+        private bool _IsInviteCancelling;
 
         /// <summary>
         /// Inviteの進捗度
@@ -285,19 +307,29 @@ namespace VRCEventUtil.ViewModels
         /// </summary>
         public async void Invite()
         {
+            _inviteCancellationTokenSrc = new CancellationTokenSource();
+
             InviteProgress = 0;
+            IsInviteAborting = false;
             IsInviting = true;
 
             var progress = new Progress<double>();
             progress.ProgressChanged += (_, val) => DispatcherHelper.UIDispatcher.Invoke(() => InviteProgress = (int)val);
-            var result = await ApiManager.Instance.Invite(InstanceId, Users, progress);
-            if (result)
+            try
             {
-                Log("Inviteに成功しました．");
+                var result = await ApiManager.Instance.Invite(InstanceId, Users, progress, _inviteCancellationTokenSrc.Token);
+                if (result)
+                {
+                    Log("Inviteに成功しました．");
+                }
+                else
+                {
+                    Log("Inviteに失敗しました．");
+                }
             }
-            else
+            catch (TaskCanceledException)
             {
-                Log("Inviteに失敗しました．");
+                Log("Inviteが中断されました．");
             }
 
             IsInviting = false;
@@ -306,6 +338,20 @@ namespace VRCEventUtil.ViewModels
         public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(InstanceId) && Users.Any();
         private ViewModelCommand _inviteCommand;
         public ViewModelCommand InviteCommand => _inviteCommand ??= new ViewModelCommand(Invite, CanInvite);
+
+        /// <summary>
+        /// Invite中断処理を行います．
+        /// </summary>
+        public void AbortInvite()
+        {
+            IsInviteAborting = true;
+            _inviteCancellationTokenSrc.Cancel();
+            Log("Inviteの送信を中断しています…");
+        }
+        private bool CanAbortInvite() => IsInviting && !IsInviteAborting;
+        private ViewModelCommand _abortInviteCommand;
+
+        public ViewModelCommand AbortInviteCommand => _abortInviteCommand ??= new ViewModelCommand(AbortInvite, CanAbortInvite);
 
         /// <summary>
         /// ワールドインスタンス作成処理を行います．

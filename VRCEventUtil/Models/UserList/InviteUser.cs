@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using CsvHelper.Configuration.Attributes;
 using Livet;
@@ -23,7 +24,7 @@ namespace VRCEventUtil.Models.UserList
         public string Name
         {
             get => _name;
-            set => RaisePropertyChangedIfSet(ref _name, value);
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _name, value));
         }
         private string _name;
 
@@ -34,7 +35,7 @@ namespace VRCEventUtil.Models.UserList
         public string Id
         {
             get => _id;
-            set => RaisePropertyChangedIfSet(ref _id, value);
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _id, value));
         }
         private string _id;
 
@@ -45,7 +46,7 @@ namespace VRCEventUtil.Models.UserList
         public bool IsOnline
         {
             get => _isOnline;
-            set => RaisePropertyChangedIfSet(ref _isOnline, value);
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isOnline, value));
         }
         private bool _isOnline;
 
@@ -56,7 +57,7 @@ namespace VRCEventUtil.Models.UserList
         public bool HasInvited
         {
             get => _hasInvited;
-            set => RaisePropertyChangedIfSet(ref _hasInvited, value);
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _hasInvited, value));
         }
         private bool _hasInvited;
 
@@ -67,7 +68,7 @@ namespace VRCEventUtil.Models.UserList
         public bool IsInWorld
         {
             get => _isInWorld;
-            set => RaisePropertyChangedIfSet(ref _isInWorld, value);
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isInWorld, value));
         }
         private bool _isInWorld;
 
@@ -78,8 +79,24 @@ namespace VRCEventUtil.Models.UserList
         public bool IsLocationCheckScheduled
         {
             get => _isLocationCheckScheduled;
-            set => RaisePropertyChangedIfSet(ref _isLocationCheckScheduled, value);
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isLocationCheckScheduled, value));
         }
         private bool _isLocationCheckScheduled;
+    }
+
+    /// <summary>
+    /// InviteUserの等値判定クラス
+    /// </summary>
+    public class InviteUserComparer : IEqualityComparer<InviteUser>
+    {
+        public bool Equals([AllowNull] InviteUser x, [AllowNull] InviteUser y)
+        {
+            return x?.Id == y?.Id;  // IDが一致していれば同一ユーザー
+        }
+
+        public int GetHashCode([DisallowNull] InviteUser obj)
+        {
+            return obj.Id.GetHashCode();
+        }
     }
 }

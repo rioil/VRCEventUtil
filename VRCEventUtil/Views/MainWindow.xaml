@@ -7,10 +7,9 @@
     xmlns:v="clr-namespace:VRCEventUtil.Views"
     xmlns:vm="clr-namespace:VRCEventUtil.ViewModels"
     xmlns:m="clr-namespace:VRCEventUtil.Models"
-    xmlns:ctrls="clr-namespace:VRCEventUtil.Controls"
     xmlns:userlist="clr-namespace:VRCEventUtil.Models.UserList"
     Title="VRChat Event Util"
-    Width="700" MinWidth="500"
+    Width="850" MinWidth="500"
     Height="750" MinHeight="650"
     WindowStartupLocation="CenterScreen">
 
@@ -377,29 +376,30 @@
                             </DataGrid>
 
                             <!--Invite実行ボタン-->
-                            <Button Grid.Row="3" Command="{Binding InviteCommand}">
-                                <Grid>
-                                    <Viewbox Stretch="Fill">
-                                        <ProgressBar VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch" Value="{Binding InviteProgress}"
-                                                     Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                    </Viewbox>
+                            <Button Grid.Row="3" Command="{Binding InviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource InviteIcon}" Fill="{StaticResource DefaultIconColorBrush}" Stretch="Uniform" Margin="4"/>
+                                    <TextBlock Text="Inviteを送信" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
 
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Path Data="{StaticResource InviteIcon}" Fill="{StaticResource DefaultIconColorBrush}" Stretch="Uniform" Margin="4"/>
-                                        <TextBlock VerticalAlignment="Center">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="Inviteを送信"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsInviting}" Value="True">
-                                                            <Setter Property="Text" Value="{Binding InviteProgress, StringFormat=Invite送信中：{0}%}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </StackPanel>
-                                </Grid>
+                            <!--Invite中断ボタン-->
+                            <Button Grid.Row="3" Command="{Binding AbortInviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource AbortInviteIcon}" Fill="{StaticResource DefaultIconColorBrush}" Stretch="Uniform" Margin="4"/>
+                                    <TextBlock VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="Invite送信を中断"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsInviteAborting}" Value="True">
+                                                        <Setter Property="Text" Value="Invite送信を中断中…"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
                             </Button>
                         </Grid>
                     </GroupBox>
