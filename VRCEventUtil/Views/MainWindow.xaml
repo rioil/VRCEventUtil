@@ -172,7 +172,7 @@
                                     <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Text="{Binding WorldId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="0" Text="{Binding WorldIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
                                          ToolTipService.ShowDuration="30000" >
                                     <TextBox.ToolTip>
                                         <TextBlock>
@@ -193,10 +193,10 @@
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Visibility" Value="Hidden"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.WorldId, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
+                                                <DataTrigger Binding="{Binding DataContext.WorldIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding DataContext.WorldId, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
+                                                <DataTrigger Binding="{Binding DataContext.WorldIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -209,18 +209,19 @@
                                 <Button Grid.Column="2" Content="インスタンスを作成" Command="{Binding CreateWorldInstanceCommand}"/>
                             </Grid>
 
-                            <TextBlock Grid.Row="2" Text="インスタンスID" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="2" Text="ロケーションID" VerticalAlignment="Center"/>
                             <Grid Grid.Row="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="60"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Text="{Binding InstanceId, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="0" Text="{Binding LocationIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
                                          ToolTipService.ShowDuration="30000" Height="25">
                                     <TextBox.ToolTip>
                                         <TextBlock>
-                                            <Run Text="インスタンスID/インスタンスURL"/>
+                                            <Run Text="ロケーションID/インスタンスURL"/>
                                             <LineBreak/>
                                             <LineBreak/>
                                             <Run Text="「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．"/>
@@ -238,10 +239,10 @@
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Visibility" Value="Hidden"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.InstanceId, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
+                                                <DataTrigger Binding="{Binding DataContext.LocationIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding DataContext.InstanceId, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
+                                                <DataTrigger Binding="{Binding DataContext.LocationIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -249,7 +250,14 @@
                                     </TextBlock.Style>
                                 </TextBlock>
 
-                                <Button Grid.Column="1" Command="{Binding OpenInVRChatCommand}">
+                                <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}">
+                                    <Border Background="Transparent" ToolTip="インスタンスURLをコピー">
+                                        <Path Data="{StaticResource CopyLinkIcon}" Fill="{StaticResource DefaultIconColorBrush}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="4"/>
+                                    </Border>
+                                </Button>
+
+                                <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}">
                                     <Border Background="Transparent" ToolTip="VRChatで開く">
                                         <Path Data="{StaticResource OpenIcon}" Fill="{StaticResource DefaultIconColorBrush}"
                                               VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="4"/>

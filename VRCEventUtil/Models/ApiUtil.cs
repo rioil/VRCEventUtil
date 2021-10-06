@@ -52,23 +52,23 @@ namespace VRCEventUtil.Models
         }
 
         /// <summary>
-        /// Location IDに変換します．
+        /// 文字列をLocation IDに変換します．
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="locationIdOrUrl">Location ID または インスタンスURL</param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
-        public static string ConvertToLocationId(string str)
+        public static string ConvertToLocationId(string locationIdOrUrl)
         {
-            if (str is null) { throw new ArgumentNullException("インスタンスIDを入力してください．"); }
+            if (locationIdOrUrl is null) { throw new ArgumentNullException("インスタンスIDを入力してください．"); }
 
-            var match = Regex.Match(str, LAUNCH_URL_PATTERN);
+            var match = Regex.Match(locationIdOrUrl, LAUNCH_URL_PATTERN);
             if (match.Success)
             {
                 return $"{match.Groups["worldId"]}:{match.Groups["instanceId"]}";
             }
-            else if (Regex.IsMatch(str, LOCATION_ID_PATTERN))
+            else if (Regex.IsMatch(locationIdOrUrl, LOCATION_ID_PATTERN))
             {
-                return str;
+                return locationIdOrUrl;
             }
             else
             {
@@ -77,40 +77,83 @@ namespace VRCEventUtil.Models
         }
 
         /// <summary>
-        /// 
+        /// ロケーションIDまたはインスタンスURLを，ワールドIDとインスタンスIDに分解します．
         /// </summary>
-        /// <param name="locationId"></param>
+        /// <param name="locationIdOrUrl"></param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
-        public static (string WorldId, string InstanceId) ResolveLocationId(string locationId)
+        public static (string WorldId, string InstanceId) ResolveLocationIdOrUrl(string locationIdOrUrl)
         {
-            var match = Regex.Match(locationId, LOCATION_ID_PATTERN);
+            var match = Regex.Match(locationIdOrUrl, LOCATION_ID_PATTERN);
             if (match.Success)
             {
                 var worldId = match.Groups["worldId"].Value;
                 var instanceId = match.Groups["instanceId"].Value;
                 return (worldId, instanceId);
             }
-            else
+
+            match = Regex.Match(locationIdOrUrl, LAUNCH_URL_PATTERN);
+            if (match.Success)
             {
-                throw new FormatException();
+                var worldId = match.Groups["worldId"].Value;
+                var instanceId = match.Groups["instanceId"].Value;
+                return (worldId, instanceId);
             }
+
+            throw new FormatException();
+        }
+
+        /// <summary>
+        /// ロケーションIDまたはインスタンスURLを，ワールドIDとインスタンスIDに分解します．
+        /// </summary>
+        /// <param name="locationIdOrUrl"></param>
+        /// <param name="worldId"></param>
+        /// <param name="instanceId"></param>
+        /// <returns></returns>
+        public static bool TryResolveLocationIdOrUrl(string locationIdOrUrl, out string worldId, out string instanceId)
+        {
+            if (locationIdOrUrl is null)
+            {
+                worldId = null;
+                instanceId = null;
+                return false;
+            }
+
+            var match = Regex.Match(locationIdOrUrl, LOCATION_ID_PATTERN);
+            if (match.Success)
+            {
+                worldId = match.Groups["worldId"].Value;
+                instanceId = match.Groups["instanceId"].Value;
+                return true;
+            }
+
+            match = Regex.Match(locationIdOrUrl, LAUNCH_URL_PATTERN);
+            if (match.Success)
+            {
+                worldId = match.Groups["worldId"].Value;
+                instanceId = match.Groups["instanceId"].Value;
+                return true;
+            }
+
+            worldId = null;
+            instanceId = null;
+            return false;
         }
 
         /// <summary>
         /// ワールドIDまたはURLを解析してワールドIDを返します．
         /// </summary>
-        /// <param name="worldId"></param>
+        /// <param name="worldIdOrUrl"></param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
-        public static string ParseWorldId(string worldId)
+        public static string ParseWorldId(string worldIdOrUrl)
         {
-            if (Regex.IsMatch(worldId, WORLD_ID_PATTERN))
+            if (Regex.IsMatch(worldIdOrUrl, WORLD_ID_PATTERN))
             {
-                return worldId;
+                return worldIdOrUrl;
             }
 
-            var match = Regex.Match(worldId, WORLD_URL_PATTERN);
+            var match = Regex.Match(worldIdOrUrl, WORLD_URL_PATTERN);
             if (match.Success)
             {
                 return match.Groups["worldId"].Value;
@@ -146,12 +189,12 @@ namespace VRCEventUtil.Models
         /// <summary>
         /// ワールドIDの形式が正しいかを判定します．
         /// </summary>
-        /// <param name="worldId"></param>
+        /// <param name="worldIdOrUrl"></param>
         /// <returns></returns>
-        public static bool ValidateWorldId(string worldId)
+        public static bool ValidateWorldIdOrUrl(string worldIdOrUrl)
         {
-            if (Regex.IsMatch(worldId, WORLD_ID_PATTERN)) { return true; }
-            if (Regex.IsMatch(worldId, WORLD_URL_PATTERN)) { return true; }
+            if (Regex.IsMatch(worldIdOrUrl, WORLD_ID_PATTERN)) { return true; }
+            if (Regex.IsMatch(worldIdOrUrl, WORLD_URL_PATTERN)) { return true; }
 
             return false;
         }

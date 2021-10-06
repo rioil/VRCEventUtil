@@ -100,20 +100,20 @@ namespace VRCEventUtil.ViewModels
         private string _MFACode;
 
         /// <summary>
-        /// インスタンスID
+        /// ロケーションID/URL
         /// </summary>
-        public string InstanceId
+        public string LocationIdOrUrl
         {
-            get => _instanceId;
+            get => _locationIdOrUrl;
             set
             {
-                if (RaisePropertyChangedIfSet(ref _instanceId, value))
+                if (RaisePropertyChangedIfSet(ref _locationIdOrUrl, value))
                 {
                     InviteCommand.RaiseCanExecuteChanged();
                 }
             }
         }
-        private string _instanceId;
+        private string _locationIdOrUrl;
 
         /// <summary>
         /// ユーザーID
@@ -126,20 +126,20 @@ namespace VRCEventUtil.ViewModels
         private string _userId;
 
         /// <summary>
-        /// ワールドID
+        /// ワールドID/URL
         /// </summary>
-        public string WorldId
+        public string WorldIdOrUrl
         {
-            get => _worldId;
+            get => _worldIdOrUrl;
             set
             {
-                if (RaisePropertyChangedIfSet(ref _worldId, value))
+                if (RaisePropertyChangedIfSet(ref _worldIdOrUrl, value))
                 {
                     CreateWorldInstanceCommand.RaiseCanExecuteChanged();
                 }
             }
         }
-        private string _worldId;
+        private string _worldIdOrUrl;
 
         /// <summary>
         /// ログ
@@ -324,7 +324,7 @@ namespace VRCEventUtil.ViewModels
             progress.ProgressChanged += (_, val) => DispatcherHelper.UIDispatcher.Invoke(() => InviteProgress = (int)val);
             try
             {
-                var result = await ApiManager.Instance.Invite(InstanceId, Users, progress, _inviteCancellationTokenSrc.Token);
+                var result = await ApiManager.Instance.Invite(LocationIdOrUrl, Users, progress, _inviteCancellationTokenSrc.Token);
                 if (result)
                 {
                     Log("Inviteに成功しました．");
@@ -342,7 +342,7 @@ namespace VRCEventUtil.ViewModels
             IsInviting = false;
         }
 
-        public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(InstanceId) && Users.Any();
+        public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(LocationIdOrUrl) && Users is object && Users.Any();
         private ViewModelCommand _inviteCommand;
         public ViewModelCommand InviteCommand => _inviteCommand ??= new ViewModelCommand(Invite, CanInvite);
 
@@ -367,7 +367,7 @@ namespace VRCEventUtil.ViewModels
         {
             try
             {
-                InstanceId = await ApiManager.Instance.CreateWorldInstance(WorldId, InstanceRegion, InstanceDisclosureRange);
+                LocationIdOrUrl = await ApiManager.Instance.CreateWorldInstance(WorldIdOrUrl, InstanceRegion, InstanceDisclosureRange);
             }
             catch (FormatException)
             {
@@ -376,13 +376,13 @@ namespace VRCEventUtil.ViewModels
                 return;
             }
 
-            var instanceId = ApiUtil.ResolveLocationId(InstanceId).InstanceId;
+            var instanceId = ApiUtil.ResolveLocationIdOrUrl(LocationIdOrUrl).InstanceId;
             Log($"インスタンスを作成しました．\n" +
                 $"サーバー地域：{InstanceRegion} 公開範囲：{InstanceDisclosureRange}\n" +
-                $"ワールドID：{WorldId}\n" +
+                $"ワールドID：{WorldIdOrUrl}\n" +
                 $"インスタンスID：{instanceId}");
         }
-        public bool CanCreateWorldInstance() => !string.IsNullOrWhiteSpace(WorldId);
+        public bool CanCreateWorldInstance() => !string.IsNullOrWhiteSpace(WorldIdOrUrl);
         public ViewModelCommand CreateWorldInstanceCommand => _createWorldInstanceCommand ??= new ViewModelCommand(CreateWorldInstance, CanCreateWorldInstance);
         private ViewModelCommand _createWorldInstanceCommand;
 
@@ -420,7 +420,7 @@ namespace VRCEventUtil.ViewModels
 
         public void OpenInVRChat()
         {
-            if (!ApiUtil.TryParseLocationIdOrUrl(InstanceId, out var locationId))
+            if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
             {
                 Log("インスタンスIDの形式が正しくありません．");
                 Messenger.Raise(new InformationMessage("インスタンスIDの形式が正しくありません．", "エラー", MessageBoxImage.Warning, "InformationMessage"));
@@ -446,6 +446,25 @@ namespace VRCEventUtil.ViewModels
         private ViewModelCommand _openInVRChatCommand;
         public ViewModelCommand OpenInVRChatCommand => _openInVRChatCommand ??= new ViewModelCommand(OpenInVRChat);
 
+        /// <summary>
+        /// インスタンスURLをクリップボードにコピーします．
+        /// </summary>
+        public void CopyInstanceLink()
+        {
+            if (ApiUtil.TryResolveLocationIdOrUrl(LocationIdOrUrl, out var worldId, out var instanceId))
+            {
+                try
+                {
+                    Clipboard.SetText($"https://vrchat.com/home/launch?worldId={worldId}&instanceId={instanceId}");
+                }
+                catch (System.Runtime.InteropServices.COMException ex) when (ex.ErrorCode == -2147221040)
+                {
+                    // クリップボード例外は握りつぶす
+                }
+            }
+        }
+        private ViewModelCommand _copyInstanceLinkCommand;
+        public ViewModelCommand CopyInstanceLinkCommand => _copyInstanceLinkCommand ??= new ViewModelCommand(CopyInstanceLink);
         #endregion コマンド
 
         #region メソッド

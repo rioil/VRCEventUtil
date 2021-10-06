@@ -292,7 +292,7 @@ namespace VRCEventUtil.Models
 
             try
             {
-                (worldId, instanceId) = ApiUtil.ResolveLocationId(locationId);
+                (worldId, instanceId) = ApiUtil.ResolveLocationIdOrUrl(locationId);
             }
             catch (FormatException ex)
             {
