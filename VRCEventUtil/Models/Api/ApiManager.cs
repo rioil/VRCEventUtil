@@ -19,20 +19,20 @@ using VRCEventUtil.Properties;
 
 namespace VRCEventUtil.Models.Api
 {
-    public class ApiManager
+    public class ApiManager : IDisposable
     {
         #region 定数
         //private const string API_BASE_ADDRESS = "https://api.vrchat.cloud/v1";
         private const string API_DOMAIN = "api.vrchat.cloud";
         #endregion 定数
 
-        #region コンストラクタ
+        #region コンストラクタ・破棄処理
         private ApiManager()
         {
             _lastApiCallTime = DateTime.Now;
 
             var token = _tokenSource.Token;
-            _apiCallRequestTask = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 while (!token.IsCancellationRequested)
                 {
@@ -56,13 +56,17 @@ namespace VRCEventUtil.Models.Api
                 }
             }, token);
         }
-        #endregion コンストラクタ
+
+        public void Dispose()
+        {
+            _tokenSource?.Cancel();
+        }
+        #endregion コンストラクタ・破棄処理
 
         #region メンバ変数
         private AuthenticationApi _authApi;
         private DateTime _lastApiCallTime;
         private readonly BlockingCollection<CountdownEvent> _apiCallRequests = new BlockingCollection<CountdownEvent>();
-        private readonly Task _apiCallRequestTask;
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
         #endregion メンバ変数
 
