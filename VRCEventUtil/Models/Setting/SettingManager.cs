@@ -37,8 +37,8 @@ namespace VRCEventUtil.Models.Setting
                 return false;
             }
 
-            AutoSetSteamExePath();
             SettingFilePath = settingFilePath;
+            AutoSetSteamExePath();
             return true;
         }
 
@@ -64,6 +64,7 @@ namespace VRCEventUtil.Models.Setting
         public static void CreateDefaultSetting(string settingFilePath = DEFAULT_SETTING_FILE_PATH)
         {
             Settings = new AppSettings();
+            SettingFilePath = settingFilePath;
             AutoSetSteamExePath();
             SaveSetting(settingFilePath);
         }
