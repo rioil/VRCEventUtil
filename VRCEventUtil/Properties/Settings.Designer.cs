@@ -61,25 +61,13 @@ namespace VRCEventUtil.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:00:05")]
-        public global::System.TimeSpan APICallInterval {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SteamPath {
             get {
-                return ((global::System.TimeSpan)(this["APICallInterval"]));
+                return ((string)(this["SteamPath"]));
             }
             set {
-                this["APICallInterval"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool NoVRMode {
-            get {
-                return ((bool)(this["NoVRMode"]));
-            }
-            set {
-                this["NoVRMode"] = value;
+                this["SteamPath"] = value;
             }
         }
     }

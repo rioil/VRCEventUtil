@@ -11,16 +11,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using VRCEventUtil.Models;
-using io.github.vrchatapi.Api;
-using io.github.vrchatapi.Client;
 using System.Threading.Tasks;
-using io.github.vrchatapi.Model;
 using VRCEventUtil.Properties;
 using VRCEventUtil.Models.UserList;
 using System.Windows;
 using System.Threading;
 using System.Collections;
 using System.Diagnostics;
+using VRCEventUtil.Models.Api;
+using VRCEventUtil.Models.Setting;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -30,6 +29,11 @@ namespace VRCEventUtil.ViewModels
         public async void Initialize()
         {
             IsLoading = true;
+            if (!SettingManager.LoadSetting())
+            {
+                SettingManager.CreateDefaultSetting();
+            }
+
             Username = Settings.Default.Username;
             ApiManager.Instance.ApiLog += msg => DispatcherHelper.UIDispatcher.Invoke(() => Log(msg));
             IsLoggedIn = await Task.Run(() => ApiManager.Instance.Login(Username, null));
@@ -45,11 +49,6 @@ namespace VRCEventUtil.ViewModels
         }
 
         #region メンバ変数
-        /// <summary>
-        /// エラー
-        /// </summary>
-        private readonly Dictionary<string, List<string>> _currentErrors = new Dictionary<string, List<string>>();
-
         /// <summary>
         /// Invite中断用キャンセルトークンソース
         /// </summary>
@@ -427,8 +426,10 @@ namespace VRCEventUtil.ViewModels
                 return;
             }
 
-            var processInfo = new ProcessStartInfo("cmd.exe",
-                $"/c start=vrchat://launch?id={locationId}{(Settings.Default.NoVRMode ? " --no-vr" : string.Empty)}")
+            //var processInfo = new ProcessStartInfo("cmd.exe",
+            //    $"/c start=vrchat://launch?id={locationId}{(Settings.Default.UseVRMode ? string.Empty : " --no-vr")}")
+            var processInfo = new ProcessStartInfo(Settings.Default.SteamPath,
+                $"--applaunch 438100 vrchat://launch?id={locationId}{(SettingManager.Settings.UseVRMode ? string.Empty : " --no-vr")}")
             {
                 CreateNoWindow = true,
                 UseShellExecute = false
@@ -465,6 +466,19 @@ namespace VRCEventUtil.ViewModels
         }
         private ViewModelCommand _copyInstanceLinkCommand;
         public ViewModelCommand CopyInstanceLinkCommand => _copyInstanceLinkCommand ??= new ViewModelCommand(CopyInstanceLink);
+
+        #region メニュー
+        /// <summary>
+        /// 設定画面を開きます．
+        /// </summary>
+        public void OpenSettingWindow()
+        {
+            Messenger.Raise(new TransitionMessage(typeof(SettingWindow), new SettingWindowViewModel(), TransitionMode.Modal, "WindowInteraction"));
+        }
+        private ViewModelCommand _openSettingWindowCommand;
+        public ViewModelCommand OpenSettingWindowCommand => _openSettingWindowCommand ??= new ViewModelCommand(OpenSettingWindow);
+
+        #endregion メニュー
         #endregion コマンド
 
         #region メソッド

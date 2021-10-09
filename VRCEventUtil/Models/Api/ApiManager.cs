@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VRCEventUtil.Properties;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -15,8 +14,10 @@ using System.Collections.Concurrent;
 using VRCEventUtil.Models.UserList;
 using System.ComponentModel;
 using VRCEventUtil.Converters;
+using VRCEventUtil.Models.Setting;
+using VRCEventUtil.Properties;
 
-namespace VRCEventUtil.Models
+namespace VRCEventUtil.Models.Api
 {
     public class ApiManager
     {
@@ -40,7 +41,7 @@ namespace VRCEventUtil.Models
                         var interval = DateTime.Now - _lastApiCallTime;
                         Logger.Log($"スレッド{Thread.CurrentThread.ManagedThreadId}:前回のAPI呼び出しからの経過時間は{interval}です．");
 
-                        TimeSpan MIN_INTERVAL = Settings.Default.APICallInterval;
+                        TimeSpan MIN_INTERVAL = TimeSpan.FromSeconds(SettingManager.Settings.ApiCallIntervalSec);
                         if (interval < MIN_INTERVAL)
                         {
                             await Task.Delay(MIN_INTERVAL - interval);
@@ -90,7 +91,7 @@ namespace VRCEventUtil.Models
         {
             Configuration.Default.Username = username;
 
-            if (await LoadAuthCookies())
+            if (SettingManager.Settings.SaveAuthCookies && await LoadAuthCookies())
             {
                 return true;
             }
@@ -114,7 +115,10 @@ namespace VRCEventUtil.Models
             }
 
             // Cookieの保存
-            SaveAuthCookie();
+            if (SettingManager.Settings.SaveAuthCookies)
+            {
+                SaveAuthCookie();
+            }
 
             CurrentUser = await _authApi.GetCurrentUserAsync();
             return true;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace VRCEventUtil.Models
+namespace VRCEventUtil.Models.Api
 {
     static class ApiUtil
     {

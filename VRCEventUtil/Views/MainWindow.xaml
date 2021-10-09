@@ -37,6 +37,10 @@
             <l:OpenFileDialogInteractionMessageAction InvokeActionOnlyWhenWindowIsActive="False"/>
         </l:InteractionMessageTrigger>
 
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}" MessageKey="WindowInteraction">
+            <l:TransitionInteractionMessageAction InvokeActionOnlyWhenWindowIsActive="False"/>
+        </l:InteractionMessageTrigger>
+
         <!--  If you make user choose 'OK or Cancel' closing Window, then please use Window Close cancel Behavior.  -->
 
     </behaviors:Interaction.Triggers>
@@ -54,7 +58,11 @@
         </Grid.RowDefinitions>
 
         <!--メニューバー-->
-        <Menu Grid.Row="0"/>
+        <Menu Grid.Row="0">
+            <MenuItem Header="ファイル(_F)">
+                <MenuItem Header="設定" Command="{Binding OpenSettingWindowCommand}"/>
+            </MenuItem>
+        </Menu>
 
         <!--認証グリッド-->
         <GroupBox Grid.Row="1" Header="認証" Margin="5 5 5 0">
