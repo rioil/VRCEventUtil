@@ -251,18 +251,14 @@
                                     </TextBlock.Style>
                                 </TextBlock>
 
-                                <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}">
-                                    <Border Background="Transparent"
-                                            ToolTip="{x:Static props:Resources.Text_CopyInstanceUrl}">
-                                        <Path Data="{StaticResource CopyLinkIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
-                                    </Border>
+                                <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}"
+                                        ToolTip="{x:Static props:Resources.Text_CopyInstanceUrl}">
+                                    <Path Data="{StaticResource CopyLinkIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                 </Button>
 
-                                <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}">
-                                    <Border Background="Transparent"
-                                            ToolTip="{x:Static props:Resources.Text_LaunchInVRChat}">
-                                        <Path Data="{StaticResource OpenIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
-                                    </Border>
+                                <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}"
+                                        ToolTip="{x:Static props:Resources.Text_LaunchInVRChat}">
+                                    <Path Data="{StaticResource OpenIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                 </Button>
                             </Grid>
                         </Grid>
