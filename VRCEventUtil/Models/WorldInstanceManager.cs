@@ -6,6 +6,7 @@ using Livet;
 using Livet.Commands;
 using System.Linq;
 using System.Threading.Tasks;
+using VRCEventUtil.Models.Api;
 
 namespace VRCEventUtil.Models
 {
