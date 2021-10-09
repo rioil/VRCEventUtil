@@ -36,14 +36,17 @@ namespace VRCEventUtil.ViewModels
 
             Username = Settings.Default.Username;
             ApiManager.Instance.ApiLog += msg => DispatcherHelper.UIDispatcher.Invoke(() => Log(msg));
-            IsLoggedIn = await Task.Run(() => ApiManager.Instance.Login(Username, null));
-            if (IsLoggedIn)
+            if (SettingManager.Settings.SaveAuthCookies)
             {
-                Log($"{Username}として自動ログインしました．");
-            }
-            else
-            {
-                Log($"自動ログインに失敗しました．ログインが必要です．");
+                IsLoggedIn = await Task.Run(() => ApiManager.Instance.Login(Username, null));
+                if (IsLoggedIn)
+                {
+                    Log(string.Format(Resources.Success_AutoLogIn, Username));
+                }
+                else
+                {
+                    Log(Resources.Fail_AutoLogin);
+                }
             }
             IsLoading = false;
         }
@@ -282,15 +285,15 @@ namespace VRCEventUtil.ViewModels
         {
             if (await ApiManager.Instance.Login(Username, Password, MFACode))
             {
-                Log($"{Username}としてログインしました．");
+                Log(string.Format(Resources.Success_Login, Username));
                 Settings.Default.Username = Username;
                 Settings.Default.Save();
                 IsLoggedIn = true;
             }
             else
             {
-                Messenger.Raise(new InformationMessage("ログインに失敗しました．\nユーザー名，パスワード（必要であれば二要素認証コード）が正しいことを確認してください．",
-                    "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                Messenger.Raise(new InformationMessage(Resources.Fail_LogIn,
+                    Resources.Title_Error, MessageBoxImage.Warning, "InformationMessage"));
             }
         }
         private ViewModelCommand _loginCommand;
@@ -303,7 +306,7 @@ namespace VRCEventUtil.ViewModels
         {
             IsLoggedIn = false;
             ApiManager.Instance.Logout();
-            Log("ログアウトしました．");
+            Log(Resources.Success_Logout);
         }
         private ViewModelCommand _logoutCommand;
         public ViewModelCommand LogoutCommand => _logoutCommand ??= new ViewModelCommand(Logout);
@@ -326,16 +329,16 @@ namespace VRCEventUtil.ViewModels
                 var result = await ApiManager.Instance.Invite(LocationIdOrUrl, Users, progress, _inviteCancellationTokenSrc.Token);
                 if (result)
                 {
-                    Log("Inviteに成功しました．");
+                    Log(Resources.Success_Invite);
                 }
                 else
                 {
-                    Log("Inviteに失敗しました．");
+                    Log(Resources.Fail_Invite);
                 }
             }
             catch (TaskCanceledException)
             {
-                Log("Inviteが中断されました．");
+                Log(Resources.Abort_Invite);
             }
 
             IsInviting = false;
@@ -352,7 +355,7 @@ namespace VRCEventUtil.ViewModels
         {
             IsInviteAborting = true;
             _inviteCancellationTokenSrc.Cancel();
-            Log("Inviteの送信を中断しています…");
+            Log(Resources.Aborting_Invite);
         }
         private bool CanAbortInvite() => IsInviting && !IsInviteAborting;
         private ViewModelCommand _abortInviteCommand;
@@ -370,16 +373,14 @@ namespace VRCEventUtil.ViewModels
             }
             catch (FormatException)
             {
-                Log("ワールドIDの形式が正しくありません．");
-                Messenger.Raise(new InformationMessage("ワールドIDの形式が正しくありません．", "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                Log(Resources.Error_InvalidWorldIdOrUrl);
+                Messenger.Raise(new InformationMessage(Resources.Error_InvalidWorldIdOrUrl, Resources.Title_Error,
+                    MessageBoxImage.Warning, "InformationMessage"));
                 return;
             }
 
             var instanceId = ApiUtil.ResolveLocationIdOrUrl(LocationIdOrUrl).InstanceId;
-            Log($"インスタンスを作成しました．\n" +
-                $"サーバー地域：{InstanceRegion} 公開範囲：{InstanceDisclosureRange}\n" +
-                $"ワールドID：{WorldIdOrUrl}\n" +
-                $"インスタンスID：{instanceId}");
+            Log(string.Format(Resources.Success_CreateInstance, InstanceRegion, InstanceDisclosureRange, WorldIdOrUrl, instanceId));
         }
         public bool CanCreateWorldInstance() => !string.IsNullOrWhiteSpace(WorldIdOrUrl);
         public ViewModelCommand CreateWorldInstanceCommand => _createWorldInstanceCommand ??= new ViewModelCommand(CreateWorldInstance, CanCreateWorldInstance);
@@ -392,8 +393,8 @@ namespace VRCEventUtil.ViewModels
         {
             var dialog = new OpeningFileSelectionMessage("OpenFileDialog")
             {
-                Title = "ユーザーリストファイル選択",
-                Filter = "CSVファイル (*.csv)|*.csv"
+                Title = Resources.Title_SelectUserListFile,
+                Filter = Resources.FileFilter_CSV
             };
             Messenger.Raise(dialog);
 
@@ -421,17 +422,17 @@ namespace VRCEventUtil.ViewModels
         {
             if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
             {
-                Log("インスタンスIDの形式が正しくありません．");
-                Messenger.Raise(new InformationMessage("インスタンスIDの形式が正しくありません．", "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                Log(Resources.Error_InvalidLocationIdOrUrl);
+                Messenger.Raise(new InformationMessage(Resources.Error_InvalidLocationIdOrUrl, Resources.Title_Error,
+                    MessageBoxImage.Warning, "InformationMessage"));
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(SettingManager.Settings.SteamExePath))
             {
-                Log("steam.exeのパスが指定されていません．ファイル(F)->設定->VRChat起動のsteam.exeのパスを設定してください．");
-                Messenger.Raise(new InformationMessage(
-                    "steam.exeのパスが指定されていません．\n「ファイル(F)->設定->VRChat起動」にある「steam.exeのパス」を設定してください．",
-                    "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                Log(Resources.Error_EmptySteamExePath);
+                Messenger.Raise(new InformationMessage(Resources.Error_EmptySteamExePath, Resources.Title_Error,
+                    MessageBoxImage.Warning, "InformationMessage"));
                 return;
             }
 
@@ -451,7 +452,7 @@ namespace VRCEventUtil.ViewModels
             catch (Exception ex)
             {
                 Logger.Log(ex);
-                Log("VRChatの起動に失敗しました．");
+                Log(Resources.Fail_LauchVRChat);
             }
         }
         private ViewModelCommand _openInVRChatCommand;

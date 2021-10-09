@@ -72,7 +72,15 @@
         </Style>
 
         <!--ボタンアイコンPath標準スタイル-->
-        <Style x:Key="ButtonIconPathStyle" TargetType="Path" BasedOn="{StaticResource IconPathDefaultStyle}">
+        <Style x:Key="ButtonIconPathStyle" TargetType="Path">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Fill">
+                <Setter.Value>
+                    <SolidColorBrush Color="#212121"/>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Margin" Value="4"/>
         </Style>
 

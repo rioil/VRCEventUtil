@@ -10,6 +10,7 @@ using System.Linq;
 using VRCEventUtil.Models;
 using VRCEventUtil.Models.Setting;
 using Livet.Messaging.IO;
+using VRCEventUtil.Properties;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -40,8 +41,8 @@ namespace VRCEventUtil.ViewModels
         {
             var dialog = new OpeningFileSelectionMessage("OpenFileDialog")
             {
-                Title = "steam.exeファイルを選択",
-                Filter = "exeファイル (*.exe)|*.exe"
+                Title = Resources.Title_SelectSteamExeFile,
+                Filter = Resources.FileFilter_Exe
             };
             Messenger.Raise(dialog);
 
@@ -72,7 +73,8 @@ namespace VRCEventUtil.ViewModels
         {
             if (Settings.IsChanged)
             {
-                var res = Messenger.GetResponse(new ConfirmationMessage("変更は保存されません．設定画面を閉じますか？", "確認", MessageBoxImage.Information, MessageBoxButton.YesNo, "ConfirmMessage"));
+                var res = Messenger.GetResponse(new ConfirmationMessage(Resources.Confirm_DiscardSettingChanges, Resources.Title_Confirm,
+                    MessageBoxImage.Information, MessageBoxButton.YesNo, "ConfirmMessage"));
                 if (res.Response != true)
                 {
                     return;

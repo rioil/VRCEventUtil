@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Aborting_Invite" xml:space="preserve">
+    <value>Inviteを中断しています…</value>
+  </data>
+  <data name="Abort_Invite" xml:space="preserve">
+    <value>Inviteを中断しました．</value>
+  </data>
+  <data name="Confirm_DiscardSettingChanges" xml:space="preserve">
+    <value>変更は保存されません．設定画面を閉じますか？</value>
+  </data>
+  <data name="Error_EmptyLocationIdOrUrl" xml:space="preserve">
+    <value>ロケーションIDまたはインスタンスURLを入力してください．</value>
+  </data>
+  <data name="Error_EmptySteamExePath" xml:space="preserve">
+    <value>steam.exeのパスが指定されていません．
+ファイル(F)-&gt;設定-&gt;VRChat起動のsteam.exeのパスを設定してください．</value>
+  </data>
+  <data name="Error_InvalidLocationIdOrUrl" xml:space="preserve">
+    <value>ロケーションIDまたはインスタンスURLの形式が正しくありません．</value>
+  </data>
+  <data name="Error_InvalidWorldIdOrUrl" xml:space="preserve">
+    <value>ワールドIDまたはワールドURLの形式が正しくありません．</value>
+  </data>
+  <data name="Fail_AutoLogin" xml:space="preserve">
+    <value>自動ログインに失敗しました．ログインが必要です．</value>
+  </data>
+  <data name="Fail_Invite" xml:space="preserve">
+    <value>Inviteに失敗しました．</value>
+  </data>
+  <data name="Fail_LauchVRChat" xml:space="preserve">
+    <value>VRChatの起動に失敗しました．</value>
+  </data>
+  <data name="Fail_LogIn" xml:space="preserve">
+    <value>ログインに失敗しました．
+ユーザー名，パスワード（必要であれば二要素認証コード）が正しいことを確認してください．</value>
+  </data>
+  <data name="FileFilter_CSV" xml:space="preserve">
+    <value>CSVファイル (*.csv)|*.csv</value>
+  </data>
+  <data name="FileFilter_Exe" xml:space="preserve">
+    <value>exeファイル (*.exe)|*.exe</value>
+  </data>
+  <data name="MenuTitle_File" xml:space="preserve">
+    <value>ファイル(_F)</value>
+  </data>
+  <data name="MenuTitle_Setting" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Success_AutoLogIn" xml:space="preserve">
+    <value>{0}として自動ログインしました．</value>
+  </data>
+  <data name="Success_CreateInstance" xml:space="preserve">
+    <value>インスタンスを作成しました．
+サーバー地域：{0}
+公開範囲：{1}
+ワールドID：{2}
+インスタンスID：{3}</value>
+  </data>
+  <data name="Success_Invite" xml:space="preserve">
+    <value>Inviteに成功しました．</value>
+  </data>
+  <data name="Success_InviteSentTo" xml:space="preserve">
+    <value>{0}にInviteを送信しました．</value>
+  </data>
+  <data name="Success_Login" xml:space="preserve">
+    <value>{0}としてログインしました．</value>
+  </data>
+  <data name="Success_Logout" xml:space="preserve">
+    <value>ログアウトしました．</value>
+  </data>
+  <data name="Text_AbortingInvite" xml:space="preserve">
+    <value>Invite送信を中断中…</value>
+  </data>
+  <data name="Text_AbortInvite" xml:space="preserve">
+    <value>Invite送信を中断</value>
+  </data>
+  <data name="Text_APICallIntervalSec" xml:space="preserve">
+    <value>API呼び出し最小間隔（秒）</value>
+  </data>
+  <data name="Text_Authentication" xml:space="preserve">
+    <value>認証</value>
+  </data>
+  <data name="Text_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Text_ClearLog" xml:space="preserve">
+    <value>ログをクリア</value>
+  </data>
+  <data name="Text_CopyInstanceUrl" xml:space="preserve">
+    <value>インスタンスURLをコピー</value>
+  </data>
+  <data name="Text_CreateInstance" xml:space="preserve">
+    <value>インスタンスを作成</value>
+  </data>
+  <data name="Text_General" xml:space="preserve">
+    <value>全般</value>
+  </data>
+  <data name="Text_ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Text_InviteSent" xml:space="preserve">
+    <value>このユーザーはInvite済みです．</value>
+  </data>
+  <data name="Text_LaunchInVRChat" xml:space="preserve">
+    <value>VRChatで開く</value>
+  </data>
+  <data name="Text_LaunchVRChat_Setting" xml:space="preserve">
+    <value>VRChat起動</value>
+  </data>
+  <data name="Text_LocationId" xml:space="preserve">
+    <value>ロケーションID</value>
+  </data>
+  <data name="Text_Log" xml:space="preserve">
+    <value>ログ</value>
+  </data>
+  <data name="Text_Login" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="Text_Logout" xml:space="preserve">
+    <value>ログアウト</value>
+  </data>
+  <data name="Text_MFACode" xml:space="preserve">
+    <value>二要素認証コード</value>
+  </data>
+  <data name="Text_NotSentInviteYet" xml:space="preserve">
+    <value>このユーザーにはInviteを送信していません．</value>
+  </data>
+  <data name="Text_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Text_Password" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="Text_SaveAuthCookies" xml:space="preserve">
+    <value>ログイン状態を保存する</value>
+  </data>
+  <data name="Text_SelectFile" xml:space="preserve">
+    <value>ファイルを選択</value>
+  </data>
+  <data name="Text_SendingInvite" xml:space="preserve">
+    <value>Inviteを送信中：{0}%</value>
+  </data>
+  <data name="Text_SendInvite" xml:space="preserve">
+    <value>Inviteを送信</value>
+  </data>
+  <data name="Text_SendTargetSetting" xml:space="preserve">
+    <value>送信先設定</value>
+  </data>
+  <data name="Text_Setting" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Text_SteamExePath" xml:space="preserve">
+    <value>steam.exeのパス</value>
+  </data>
+  <data name="Text_UserInInstance" xml:space="preserve">
+    <value>このユーザーはInvite先のインスタンスにいます．</value>
+  </data>
+  <data name="Text_UserListFile" xml:space="preserve">
+    <value>ユーザーリストファイル</value>
+  </data>
+  <data name="Text_Username" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="Text_UserNotInInstance" xml:space="preserve">
+    <value>このユーザーはInvite先のインスタンスにいません．</value>
+  </data>
+  <data name="Text_UserOffline" xml:space="preserve">
+    <value>このユーザーはオフラインです．</value>
+  </data>
+  <data name="Text_UseVRMode" xml:space="preserve">
+    <value>VRモードを使用する</value>
+  </data>
+  <data name="Text_WaitingJoin" xml:space="preserve">
+    <value>Joinを待っています…</value>
+  </data>
+  <data name="Text_WorldId" xml:space="preserve">
+    <value>ワールドID</value>
+  </data>
+  <data name="Text_WorldInstanceSetting" xml:space="preserve">
+    <value>ワールド・インスタンス設定</value>
+  </data>
+  <data name="Title_Confirm" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="Title_Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="Title_SelectSteamExeFile" xml:space="preserve">
+    <value>steam.exeファイルを選択</value>
+  </data>
+  <data name="Title_SelectUserListFile" xml:space="preserve">
+    <value>ユーザーリストファイル選択</value>
+  </data>
+  <data name="Tooltip_LocationIdOrUrl" xml:space="preserve">
+    <value>ロケーションID/インスタンスURL
+
+「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．
+
+インスタンスURL（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;amp;instanceId=00000~region(jp)）
+または，ワールドID:インスタンスID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812:00000~region(jp)）のいずれかの形式で入力してください．</value>
+  </data>
+  <data name="Tooltip_WorldIdOrUrl" xml:space="preserve">
+    <value>ワールドID/ワールドURL
+
+ワールドID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812）または，
+ワールドURL（例：https://vrchat.com/home/world/wrld_ba913a96-fac4-4048-a062-9aa5db092812）
+のいずれかの形式で入力してください．</value>
+  </data>
+</root>

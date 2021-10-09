@@ -201,7 +201,7 @@ namespace VRCEventUtil.Models.Api
                             return false;
                         }
 
-                        ApiLog?.Invoke($"{user.Name}にInviteを送信しました．");
+                        ApiLog?.Invoke(string.Format(Resources.Success_InviteSentTo, user.Name));
                         user.HasInvited = true;
                         user.IsLocationCheckScheduled = true;
                     }

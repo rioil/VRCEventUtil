@@ -9,6 +9,7 @@
     xmlns:conv="clr-namespace:VRCEventUtil.Converters"
     xmlns:m="clr-namespace:VRCEventUtil.Models"
     xmlns:userlist="clr-namespace:VRCEventUtil.Models.UserList"
+    xmlns:props="clr-namespace:VRCEventUtil.Properties"
     Title="VRChat Event Util"
     Width="850" MinWidth="500"
     Height="750" MinHeight="650"
@@ -59,8 +60,9 @@
 
         <!--メニューバー-->
         <Menu Grid.Row="0">
-            <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="設定" Command="{Binding OpenSettingWindowCommand}">
+            <MenuItem Header="{x:Static props:Resources.MenuTitle_File}">
+                <MenuItem Header="{x:Static props:Resources.MenuTitle_Setting}"
+                          Command="{Binding OpenSettingWindowCommand}">
                     <MenuItem.Icon>
                         <Path Data="{StaticResource SettingIcon}" Style="{StaticResource IconPathDefaultStyle}"/>
                     </MenuItem.Icon>
@@ -69,7 +71,7 @@
         </Menu>
 
         <!--認証グリッド-->
-        <GroupBox Grid.Row="1" Header="認証" Margin="5 5 5 0">
+        <GroupBox Grid.Row="1" Header="{x:Static props:Resources.Text_Authentication}" Margin="5 5 5 0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="16"/>
@@ -89,18 +91,19 @@
                     </Style>
                 </Grid.Resources>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="ユーザー名"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static props:Resources.Text_Username}"/>
                 <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Username}" ToolTip="Username" VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="パスワード"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Static props:Resources.Text_Password}"/>
                 <PasswordBox Grid.Row="1" Grid.Column="1" ToolTip="Password" VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
                     <behaviors:Interaction.Behaviors>
                         <l:PasswordBoxBindingSupportBehavior Password="{Binding Password}"/>
                     </behaviors:Interaction.Behaviors>
                 </PasswordBox>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="二要素認証コード"/>
-                <PasswordBox Grid.Row="1" Grid.Column="2" ToolTip="二要素認証コード" VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Static props:Resources.Text_MFACode}"/>
+                <PasswordBox Grid.Row="1" Grid.Column="2" ToolTip="{x:Static props:Resources.Text_MFACode}"
+                             VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
                     <behaviors:Interaction.Behaviors>
                         <l:PasswordBoxBindingSupportBehavior Password="{Binding MFACode}"/>
                     </behaviors:Interaction.Behaviors>
@@ -109,11 +112,11 @@
                 <Button Grid.Row="1" Grid.Column="3">
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="Content" Value="ログイン"/>
+                            <Setter Property="Content" Value="{x:Static props:Resources.Text_Login}"/>
                             <Setter Property="Command" Value="{Binding LoginCommand}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLoggedIn}" Value="True">
-                                    <Setter Property="Content" Value="ログアウト"/>
+                                    <Setter Property="Content" Value="{x:Static props:Resources.Text_Logout}"/>
                                     <Setter Property="Command" Value="{Binding LogoutCommand}"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -167,7 +170,8 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <GroupBox Grid.Row="0" Header="ワールド・インスタンス設定" Padding="0 5 0 0">
+                    <GroupBox Grid.Row="0" Header="{x:Static props:Resources.Text_WorldInstanceSetting}"
+                              Padding="0 5 0 0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="16"/>
@@ -176,7 +180,7 @@
                                 <RowDefinition Height="25"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="ワールドID" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_WorldId}" VerticalAlignment="Center"/>
                             <Grid Grid.Row="1" Height="25">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -184,19 +188,11 @@
                                     <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
 
+                                <!--ワールドID入力欄-->
                                 <TextBox Grid.Column="0" Text="{Binding WorldIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
                                          ToolTipService.ShowDuration="30000" >
                                     <TextBox.ToolTip>
-                                        <TextBlock>
-                                            <Run Text="ワールドID/ワールドURL"/>
-                                            <LineBreak/>
-                                            <LineBreak/>
-                                            <Run Text="ワールドID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812）または，"/>
-                                            <LineBreak/>
-                                            <Run Text="ワールドURL（例：https://vrchat.com/home/world/wrld_ba913a96-fac4-4048-a062-9aa5db092812）"/>
-                                            <LineBreak/>
-                                            <Run Text="のいずれかの形式で入力してください．"/>
-                                        </TextBlock>
+                                        <TextBlock Text="{x:Static props:Resources.Tooltip_WorldIdOrUrl}"/>
                                     </TextBox.ToolTip>
                                 </TextBox>
                                 <TextBlock Grid.Column="0" Text="例：wrld_ba913a96-fac4-4048-a062-9aa5db092812" VerticalAlignment="Center"
@@ -218,10 +214,13 @@
 
                                 <ComboBox Grid.Column="1" SelectedValue="{Binding InstanceDisclosureRange}" ItemsSource="{Binding DisclosureRanges}"
                                           VerticalContentAlignment="Center"/>
-                                <Button Grid.Column="2" Content="インスタンスを作成" Command="{Binding CreateWorldInstanceCommand}"/>
+                                <Button Grid.Column="2" Content="{x:Static props:Resources.Text_CreateInstance}"
+                                        Command="{Binding CreateWorldInstanceCommand}"/>
                             </Grid>
 
-                            <TextBlock Grid.Row="2" Text="ロケーションID" VerticalAlignment="Center"/>
+                            <!--ロケーションID入力欄-->
+                            <TextBlock Grid.Row="2" Text="{x:Static props:Resources.Text_LocationId}"
+                                       VerticalAlignment="Center"/>
                             <Grid Grid.Row="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -232,17 +231,7 @@
                                 <TextBox Grid.Column="0" Text="{Binding LocationIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
                                          ToolTipService.ShowDuration="30000" Height="25">
                                     <TextBox.ToolTip>
-                                        <TextBlock>
-                                            <Run Text="ロケーションID/インスタンスURL"/>
-                                            <LineBreak/>
-                                            <LineBreak/>
-                                            <Run Text="「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．"/>
-                                            <LineBreak/>
-                                            <LineBreak/>
-                                            <Run Text="インスタンスURL（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)）"/>
-                                            <LineBreak/>
-                                            <Run Text="または，ワールドID:インスタンスID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812:00000~region(jp)）のいずれかの形式で入力してください．"/>
-                                        </TextBlock>
+                                        <TextBlock Text="{x:Static props:Resources.Tooltip_LocationIdOrUrl}"/>
                                     </TextBox.ToolTip>
                                 </TextBox>
                                 <TextBlock Grid.Column="0" Text="例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)" VerticalAlignment="Center"
@@ -263,13 +252,15 @@
                                 </TextBlock>
 
                                 <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}">
-                                    <Border Background="Transparent" ToolTip="インスタンスURLをコピー">
+                                    <Border Background="Transparent"
+                                            ToolTip="{x:Static props:Resources.Text_CopyInstanceUrl}">
                                         <Path Data="{StaticResource CopyLinkIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                     </Border>
                                 </Button>
 
                                 <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}">
-                                    <Border Background="Transparent" ToolTip="VRChatで開く">
+                                    <Border Background="Transparent"
+                                            ToolTip="{x:Static props:Resources.Text_LaunchInVRChat}">
                                         <Path Data="{StaticResource OpenIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                     </Border>
                                 </Button>
@@ -277,7 +268,7 @@
                         </Grid>
                     </GroupBox>
 
-                    <GroupBox Grid.Row="1" Header="送信先設定" Padding="0 5 0 0">
+                    <GroupBox Grid.Row="1" Header="{x:Static props:Resources.Text_SendTargetSetting}" Padding="0 5 0 0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="16"/>
@@ -286,22 +277,25 @@
                                 <RowDefinition Height="25"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="ユーザーリストファイル" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_UserListFile}"
+                                       VerticalAlignment="Center"/>
 
                             <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding UserListFilePath}" IsReadOnly="True" VerticalContentAlignment="Center"/>
-                                <Button Grid.Column="1" Content="ファイルを選択" Command="{Binding SelectUserListFileCommand}"/>
+                                <TextBox Grid.Column="0" Text="{Binding UserListFilePath}" IsReadOnly="True"
+                                         VerticalContentAlignment="Center"/>
+                                <Button Grid.Column="1" Content="{x:Static props:Resources.Text_SelectFile}"
+                                        Command="{Binding SelectUserListFileCommand}"/>
                             </Grid>
 
                             <DataGrid Grid.Row="2" ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserResizeRows="False"
                                       CanUserAddRows="False" IsReadOnly="True" VirtualizingPanel.ScrollUnit="Pixel">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="ユーザー名" Binding="{Binding Name}" MinWidth="60"/>
-                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="245" CanUserResize="False"/>
+                                    <DataGridTextColumn Header="{x:Static props:Resources.Text_Username}" Binding="{Binding Name}" MinWidth="60"/>
+                                    <DataGridTextColumn Header="{x:Static props:Resources.Text_ID}" Binding="{Binding Id}" Width="245" CanUserResize="False"/>
 
                                     <!--Invite送信済みか-->
                                     <DataGridTemplateColumn SortMemberPath="HasInvited" MinWidth="40">
@@ -324,10 +318,10 @@
 
                                                     <Border.Style>
                                                         <Style TargetType="Border">
-                                                            <Setter Property="ToolTip" Value="このユーザーにはInviteを送信していません．"/>
+                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_NotSentInviteYet}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding HasInvited}" Value="True">
-                                                                    <Setter Property="ToolTip" Value="このユーザーはInvite済みです．"/>
+                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_InviteSent}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -365,18 +359,18 @@
 
                                                     <Border.Style>
                                                         <Style TargetType="Border">
-                                                            <Setter Property="ToolTip" Value="このユーザーはオフラインです．"/>
+                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserOffline}"/>
                                                             <Style.Triggers>
                                                                 <MultiDataTrigger>
                                                                     <MultiDataTrigger.Conditions>
                                                                         <Condition Binding="{Binding IsInWorld}" Value="False"/>
                                                                         <Condition Binding="{Binding IsOnline}" Value="True"/>
                                                                     </MultiDataTrigger.Conditions>
-                                                                    <Setter Property="ToolTip" Value="このユーザーはInvite先のインスタンスにいません．"/>
+                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserNotInInstance}"/>
                                                                 </MultiDataTrigger>
 
                                                                 <DataTrigger Binding="{Binding IsInWorld}" Value="True">
-                                                                    <Setter Property="ToolTip" Value="このユーザーはInvite先のインスタンスにいます．"/>
+                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserInInstance}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -410,7 +404,7 @@
                                                             <Setter Property="ToolTip" Value="{x:Null}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsLocationCheckScheduled}" Value="True">
-                                                                    <Setter Property="ToolTip" Value="Joinを待っています…"/>
+                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_WaitingJoin}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -441,7 +435,7 @@
                             <Button Grid.Row="3" Command="{Binding InviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
-                                    <TextBlock Text="Inviteを送信" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Static props:Resources.Text_SendInvite}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
 
@@ -452,10 +446,10 @@
                                     <TextBlock VerticalAlignment="Center">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="Invite送信を中断"/>
+                                                <Setter Property="Text" Value="{x:Static props:Resources.Text_AbortInvite}"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsInviteAborting}" Value="True">
-                                                        <Setter Property="Text" Value="Invite送信を中断中…"/>
+                                                        <Setter Property="Text" Value="{x:Static props:Resources.Text_AbortingInvite}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -477,7 +471,7 @@
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="実行ログ" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_Log}" VerticalAlignment="Center"/>
             <ListBox Grid.Row="1" ItemsSource="{Binding Logs}" VirtualizingPanel.ScrollUnit="Pixel">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -489,7 +483,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <Button Grid.Row="2" Content="ログクリア" Command="{Binding ClaerLogCommand}"/>
+            <Button Grid.Row="2" Content="{x:Static props:Resources.Text_ClearLog}" Command="{Binding ClaerLogCommand}"/>
         </Grid>
 
         <!--<GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
@@ -500,7 +494,7 @@
             <ProgressBar Width="100" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}"/>
             <ProgressBar Width="100" Height="10" Value="{Binding InviteProgress}" Visibility="{Binding IsInviting, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}">
                 <ProgressBar.ToolTip>
-                    <TextBlock Text="{Binding InviteProgress, StringFormat=Invite送信中：{0}%}"/>
+                    <TextBlock Text="{Binding InviteProgress, StringFormat={x:Static props:Resources.Text_SendingInvite}}"/>
                 </ProgressBar.ToolTip>
             </ProgressBar>
         </StatusBar>

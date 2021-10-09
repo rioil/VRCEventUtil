@@ -5,7 +5,8 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:VRCEventUtil.Views"
         xmlns:vm="clr-namespace:VRCEventUtil.ViewModels"
-        Title="設定" Height="500" Width="400"
+        xmlns:props="clr-namespace:VRCEventUtil.Properties"
+        Title="{x:Static props:Resources.Text_Setting}" Height="500" Width="400"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Icon="/VRCEventUtil;component/Resources/settings.png">
@@ -87,11 +88,11 @@
                     <Setter Property="Padding" Value="0 5 0 0"/>
                 </Style>
             </StackPanel.Resources>
-            
-            <GroupBox Header="全般">
+
+            <GroupBox Header="{x:Static props:Resources.Text_General}">
                 <StackPanel>
-                    <CheckBox IsChecked="{Binding Settings.SaveAuthCookies}" Content="ログイン状態を保存する"/>
-                    <TextBlock Text="API呼び出し最小間隔（秒）"/>
+                    <CheckBox IsChecked="{Binding Settings.SaveAuthCookies}" Content="{x:Static props:Resources.Text_SaveAuthCookies}"/>
+                    <TextBlock Text="{x:Static props:Resources.Text_APICallIntervalSec}"/>
                     <DockPanel>
                         <TextBox Text="{Binding Settings.ApiCallIntervalSec}" Width="25" DockPanel.Dock="Right" Margin="5 0 0 10"
                                  VerticalContentAlignment="Center" MaxLength="2"/>
@@ -101,12 +102,12 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="VRChat起動">
+            <GroupBox Header="{x:Static props:Resources.Text_LaunchVRChat_Setting}">
                 <StackPanel>
-                    <TextBlock Text="steam.exeのパス"/>
+                    <TextBlock Text="{x:Static props:Resources.Text_SteamExePath}"/>
                     <DockPanel>
                         <Button Content="..." Command="{Binding SelectSteamExePathCommand}" Width="30"
-                                DockPanel.Dock="Right" ToolTip="ファイルを選択"/>
+                                DockPanel.Dock="Right" ToolTip="{x:Static props:Resources.Text_SelectFile}"/>
                         <TextBox Text="{Binding Settings.SteamExePath}" IsReadOnly="True"
                                  ToolTip="{Binding Settings.SteamExePath}" Margin="0 0 0 10">
                             <TextBox.Style>
@@ -124,8 +125,8 @@
                             </TextBox.Style>
                         </TextBox>
                     </DockPanel>
-                    
-                    <CheckBox IsChecked="{Binding Settings.UseVRMode}" Content="VRモードを使用する"/>
+
+                    <CheckBox IsChecked="{Binding Settings.UseVRMode}" Content="{x:Static props:Resources.Text_UseVRMode}"/>
                 </StackPanel>
             </GroupBox>
         </StackPanel>
@@ -137,8 +138,8 @@
                     <Setter Property="Margin" Value="5 0"/>
                 </Style>
             </StackPanel.Resources>
-            <Button Content="OK" Command="{Binding SaveCommand}"/>
-            <Button Content="キャンセル" Command="{Binding CancelCommand}"/>
+            <Button Content="{x:Static props:Resources.Text_OK}" Command="{Binding SaveCommand}"/>
+            <Button Content="{x:Static props:Resources.Text_Cancel}" Command="{Binding CancelCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

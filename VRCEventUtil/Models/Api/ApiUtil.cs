@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using VRCEventUtil.Properties;
 
 namespace VRCEventUtil.Models.Api
 {
@@ -59,7 +60,7 @@ namespace VRCEventUtil.Models.Api
         /// <exception cref="FormatException"></exception>
         public static string ConvertToLocationId(string locationIdOrUrl)
         {
-            if (locationIdOrUrl is null) { throw new ArgumentNullException("インスタンスIDを入力してください．"); }
+            if (locationIdOrUrl is null) { throw new ArgumentNullException(Resources.Error_EmptyLocationIdOrUrl); }
 
             var match = Regex.Match(locationIdOrUrl, LAUNCH_URL_PATTERN);
             if (match.Success)
@@ -72,7 +73,7 @@ namespace VRCEventUtil.Models.Api
             }
             else
             {
-                throw new FormatException("インスタンスIDの形式が正しくありません．");
+                throw new FormatException(Resources.Error_InvalidLocationIdOrUrl);
             }
         }
 
