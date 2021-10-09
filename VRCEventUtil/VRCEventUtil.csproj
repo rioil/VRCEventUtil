@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\settings.ico" />
+    <None Remove="Resources\settings.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
     <PackageReference Include="LivetCask" Version="3.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -45,6 +50,10 @@
 
   <ItemGroup>
     <Folder Include="Controls\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\settings.png" />
   </ItemGroup>
 
 </Project>

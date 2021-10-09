@@ -60,7 +60,11 @@
         <!--メニューバー-->
         <Menu Grid.Row="0">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="設定" Command="{Binding OpenSettingWindowCommand}"/>
+                <MenuItem Header="設定" Command="{Binding OpenSettingWindowCommand}">
+                    <MenuItem.Icon>
+                        <Path Data="{StaticResource SettingIcon}" Style="{StaticResource IconPathDefaultStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
@@ -260,15 +264,13 @@
 
                                 <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}">
                                     <Border Background="Transparent" ToolTip="インスタンスURLをコピー">
-                                        <Path Data="{StaticResource CopyLinkIcon}" Fill="{StaticResource DefaultIconColorBrush}"
-                                              VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="4"/>
+                                        <Path Data="{StaticResource CopyLinkIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                     </Border>
                                 </Button>
 
                                 <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}">
                                     <Border Background="Transparent" ToolTip="VRChatで開く">
-                                        <Path Data="{StaticResource OpenIcon}" Fill="{StaticResource DefaultIconColorBrush}"
-                                              VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="4"/>
+                                        <Path Data="{StaticResource OpenIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                     </Border>
                                 </Button>
                             </Grid>
@@ -438,7 +440,7 @@
                             <!--Invite実行ボタン-->
                             <Button Grid.Row="3" Command="{Binding InviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Path Data="{StaticResource InviteIcon}" Fill="{StaticResource DefaultIconColorBrush}" Stretch="Uniform" Margin="4"/>
+                                    <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                     <TextBlock Text="Inviteを送信" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
