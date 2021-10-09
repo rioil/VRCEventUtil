@@ -426,9 +426,18 @@ namespace VRCEventUtil.ViewModels
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(SettingManager.Settings.SteamExePath))
+            {
+                Log("steam.exeのパスが指定されていません．ファイル(F)->設定->VRChat起動のsteam.exeのパスを設定してください．");
+                Messenger.Raise(new InformationMessage(
+                    "steam.exeのパスが指定されていません．\nファイル(F)->設定->VRChat起動のsteam.exeのパスを設定してください．",
+                    "エラー", MessageBoxImage.Warning, "InformationMessage"));
+                return;
+            }
+
             //var processInfo = new ProcessStartInfo("cmd.exe",
             //    $"/c start=vrchat://launch?id={locationId}{(Settings.Default.UseVRMode ? string.Empty : " --no-vr")}")
-            var processInfo = new ProcessStartInfo(Settings.Default.SteamPath,
+            var processInfo = new ProcessStartInfo(SettingManager.Settings.SteamExePath,
                 $"--applaunch 438100 vrchat://launch?id={locationId}{(SettingManager.Settings.UseVRMode ? string.Empty : " --no-vr")}")
             {
                 CreateNoWindow = true,
@@ -442,6 +451,7 @@ namespace VRCEventUtil.ViewModels
             catch (Exception ex)
             {
                 Logger.Log(ex);
+                Log("VRChatの起動に失敗しました．");
             }
         }
         private ViewModelCommand _openInVRChatCommand;

@@ -14,7 +14,7 @@ namespace VRCEventUtil.Models.Setting
 
         public static string SettingFilePath { get; private set; }
 
-        public static AppSettings Settings { get; private set; }
+        public static AppSettings Settings { get; set; }
 
         public static bool LoadSetting(string settingFilePath = DEFAULT_SETTING_FILE_PATH)
         {
@@ -35,6 +35,13 @@ namespace VRCEventUtil.Models.Setting
             {
                 Logger.Log(ex);
                 return false;
+            }
+
+            // steam.exeのパス設定
+            if (!File.Exists(Settings.SteamExePath))
+            {
+                Settings.SteamExePath = SearchSteamExe();
+                SaveSetting(settingFilePath);
             }
 
             SettingFilePath = settingFilePath;
@@ -64,6 +71,21 @@ namespace VRCEventUtil.Models.Setting
         {
             Settings = new AppSettings();
             SaveSetting(settingFilePath);
+        }
+
+        /// <summary>
+        /// steam.exeを検索してパスを取得します．
+        /// </summary>
+        /// <returns>パス．見つからなければnull</returns>
+        public static string SearchSteamExe()
+        {
+            const string DEFAULT_PATH = @"C:\Program Files (x86)\Steam\steam.exe";
+            if (File.Exists(DEFAULT_PATH))
+            {
+                return DEFAULT_PATH;
+            }
+
+            return null;
         }
     }
 

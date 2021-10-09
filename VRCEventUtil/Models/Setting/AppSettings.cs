@@ -50,6 +50,22 @@ namespace VRCEventUtil.Models.Setting
         private int _apiCallIntervalSec = 2;
 
         /// <summary>
+        /// SteamのEXEファイルのパス
+        /// </summary>
+        public string SteamExePath
+        {
+            get => _steamExePath;
+            set
+            {
+                if (RaisePropertyChangedIfSet(ref _steamExePath, value))
+                {
+                    IsChanged = true;
+                }
+            }
+        }
+        private string _steamExePath;
+
+        /// <summary>
         /// VRChatの起動にVRModeを使用するか
         /// </summary>
         public bool UseVRMode
@@ -65,5 +81,11 @@ namespace VRCEventUtil.Models.Setting
         }
         private bool _useVRMode;
         #endregion 変更通知プロパティ
+
+        /// <summary>
+        /// 設定の簡易コピーを作成します．
+        /// </summary>
+        /// <returns></returns>
+        public AppSettings ShallowCopy() => MemberwiseClone() as AppSettings;
     }
 }

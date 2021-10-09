@@ -58,17 +58,5 @@ namespace VRCEventUtil.Properties {
                 this["MFACookie"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SteamPath {
-            get {
-                return ((string)(this["SteamPath"]));
-            }
-            set {
-                this["SteamPath"] = value;
-            }
-        }
     }
 }

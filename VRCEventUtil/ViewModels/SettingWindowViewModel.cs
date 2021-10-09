@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using VRCEventUtil.Models;
 using VRCEventUtil.Models.Setting;
+using Livet.Messaging.IO;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -16,7 +17,7 @@ namespace VRCEventUtil.ViewModels
     {
         public void Initialize()
         {
-            Settings = SettingManager.Settings;
+            Settings =  SettingManager.Settings.ShallowCopy();
             Settings.IsChanged = false;
         }
 
@@ -31,11 +32,33 @@ namespace VRCEventUtil.ViewModels
         private AppSettings _settings;
 
         #region コマンド
+
+        /// <summary>
+        /// SteamのEXEファイルパス選択画面を表示します．
+        /// </summary>
+        public void SelectSteamExePath()
+        {
+            var dialog = new OpeningFileSelectionMessage("OpenFileDialog")
+            {
+                Title = "steam.exeファイルを選択",
+                Filter = "exeファイル (*.exe)|*.exe"
+            };
+            Messenger.Raise(dialog);
+
+            if (dialog.Response is object && dialog.Response.Any())
+            {
+                Settings.SteamExePath = dialog.Response[0];
+            }
+        }
+        private ViewModelCommand _selectSteamExePathCommand;
+        public ViewModelCommand SelectSteamExePathCommand => _selectSteamExePathCommand ??= new ViewModelCommand(SelectSteamExePath);
+
         /// <summary>
         /// 設定を保存して画面を閉じます．
         /// </summary>
         public void Save()
         {
+            SettingManager.Settings = Settings;
             SettingManager.SaveSetting();
             Messenger.Raise(new InteractionMessage("CloseWindow"));
         }
