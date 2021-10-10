@@ -92,10 +92,13 @@
                 </Grid.Resources>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static props:Resources.Text_Username}"/>
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Username}" ToolTip="Username" VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}"/>
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Username}"
+                         ToolTip="{x:Static props:Resources.Text_Username}" VerticalContentAlignment="Center"
+                         Style="{StaticResource LoggedOutOnly}"/>
 
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Static props:Resources.Text_Password}"/>
-                <PasswordBox Grid.Row="1" Grid.Column="1" ToolTip="Password" VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
+                <PasswordBox Grid.Row="1" Grid.Column="1" ToolTip="{x:Static props:Resources.Text_Password}"
+                             VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
                     <behaviors:Interaction.Behaviors>
                         <l:PasswordBoxBindingSupportBehavior Password="{Binding Password}"/>
                     </behaviors:Interaction.Behaviors>
