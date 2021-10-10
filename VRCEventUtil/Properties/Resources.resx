@@ -120,6 +120,9 @@
   <data name="Aborting_Invite" xml:space="preserve">
     <value>Inviteを中断しています…</value>
   </data>
+  <data name="Abort_CreateInstance" xml:space="preserve">
+    <value>インスタンスの作成をキャンセルしました．</value>
+  </data>
   <data name="Abort_Invite" xml:space="preserve">
     <value>Inviteを中断しました．</value>
   </data>

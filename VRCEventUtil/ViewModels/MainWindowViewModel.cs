@@ -336,7 +336,7 @@ namespace VRCEventUtil.ViewModels
                     Log(Resources.Fail_Invite);
                 }
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 Log(Resources.Abort_Invite);
             }
@@ -376,6 +376,11 @@ namespace VRCEventUtil.ViewModels
                 Log(Resources.Error_InvalidWorldIdOrUrl);
                 Messenger.Raise(new InformationMessage(Resources.Error_InvalidWorldIdOrUrl, Resources.Title_Error,
                     MessageBoxImage.Warning, "InformationMessage"));
+                return;
+            }
+            catch (OperationCanceledException)
+            {
+                Log(Resources.Abort_CreateInstance);
                 return;
             }
 

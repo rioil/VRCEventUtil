@@ -61,6 +61,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   インスタンスの作成をキャンセルしました． に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Abort_CreateInstance {
+            get {
+                return ResourceManager.GetString("Abort_CreateInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Inviteを中断しました． に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Abort_Invite {

@@ -143,7 +143,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="progress"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        /// <exception cref="TaskCanceledException"></exception>
+        /// <exception cref="OperationCanceledException"></exception>
         public async Task<bool> Invite(string locationId, IEnumerable<InviteUser> users, IProgress<double> progress, CancellationToken cancellationToken)
         {
             return await Task.Run(async () =>
@@ -220,13 +220,14 @@ namespace VRCEventUtil.Models.Api
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
+        /// <exception cref="OperationCanceledException"></exception>
         public async Task<User> GetUserInfo(string userId, CancellationToken cancellationToken)
         {
             var apiInstance = new UsersApi(_authApi.Configuration);
 
             try
             {
-                WaitApiCallInterval();
+                WaitApiCallInterval(cancellationToken);
                 return await apiInstance.GetUserAsync(userId, cancellationToken);
             }
             catch (ApiException ex)
@@ -263,9 +264,12 @@ namespace VRCEventUtil.Models.Api
         /// <param name="worldIdOrUrl"></param>
         /// <param name="region"></param>
         /// <param name="disclosureRange"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
-        public async Task<string> CreateWorldInstance(string worldIdOrUrl, ERegion region = ERegion.JP, EDisclosureRange disclosureRange = EDisclosureRange.Invite)
+        /// <exception cref="OperationCanceledException"></exception>
+        public async Task<string> CreateWorldInstance(string worldIdOrUrl, ERegion region = ERegion.JP,
+            EDisclosureRange disclosureRange = EDisclosureRange.Invite, CancellationToken? cancellationToken = null)
         {
             return await Task.Run(async () =>
             {
@@ -273,7 +277,7 @@ namespace VRCEventUtil.Models.Api
 
                 try
                 {
-                    WaitApiCallInterval();
+                    WaitApiCallInterval(cancellationToken);
                     var user = await new UsersApi(_authApi.Configuration).GetUserByNameAsync(_authApi.Configuration.Username);
                     var userId = user.Id;
                     var instanceId = CreateNewLocationId(worldId, userId, region, disclosureRange);
@@ -338,11 +342,20 @@ namespace VRCEventUtil.Models.Api
         /// <summary>
         /// API呼び出し間隔制限を守るように処理を待ちます．
         /// </summary>
-        private void WaitApiCallInterval()
+        /// <param name="cancellationToken">キャンセルトークン</param>
+        /// <exception cref="OperationCanceledException"></exception>
+        private void WaitApiCallInterval(CancellationToken? cancellationToken = null)
         {
             var e = new CountdownEvent(1);
             _apiCallRequests.Add(e);
-            e.Wait();
+            if (cancellationToken is null)
+            {
+                e.Wait();
+            }
+            else
+            {
+                e.Wait(cancellationToken.Value);
+            }
         }
 
         /// <summary>
@@ -442,12 +455,12 @@ namespace VRCEventUtil.Models.Api
         /// <param name="inviteRequest"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        /// <exception cref="TaskCanceledException"></exception>
+        /// <exception cref="OperationCanceledException"></exception>
         private async Task<bool> Invite(string userId, InviteApi apiInstance, InviteRequest inviteRequest, CancellationToken cancellationToken)
         {
             try
             {
-                WaitApiCallInterval();
+                WaitApiCallInterval(cancellationToken);
                 var result = await apiInstance.InviteUserAsync(userId, inviteRequest, cancellationToken);
                 return true;
             }
@@ -460,6 +473,10 @@ namespace VRCEventUtil.Models.Api
             {
                 Logger.Log(ex);
                 return false;
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new OperationCanceledException("Inviteの送信をキャンセルしました.", ex, cancellationToken);    // キャンセルによる例外はOperationCanceledExceptionにまとめる
             }
         }
 
