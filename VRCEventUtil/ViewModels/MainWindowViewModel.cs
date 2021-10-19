@@ -399,7 +399,7 @@ namespace VRCEventUtil.ViewModels
             var dialog = new OpeningFileSelectionMessage("OpenFileDialog")
             {
                 Title = Resources.Title_SelectUserListFile,
-                Filter = Resources.FileFilter_CSV
+                Filter = Resources.FileFilter_JSON
             };
             Messenger.Raise(dialog);
 

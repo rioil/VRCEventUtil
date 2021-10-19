@@ -10,9 +10,9 @@
     xmlns:m="clr-namespace:VRCEventUtil.Models"
     xmlns:userlist="clr-namespace:VRCEventUtil.Models.UserList"
     xmlns:props="clr-namespace:VRCEventUtil.Properties"
-    Title="VRChat Event Util"
-    Width="850" MinWidth="500"
-    Height="750" MinHeight="650"
+    Title="VRChat Invite Util"
+    Width="900" MinWidth="800"
+    Height="650" MinHeight="650"
     WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
@@ -49,12 +49,11 @@
     <Window.Resources>
     </Window.Resources>
 
+    <!--全体グリッド-->
     <Grid IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*" MinHeight="260"/>
-            <RowDefinition Height="180"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
@@ -70,426 +69,451 @@
             </MenuItem>
         </Menu>
 
-        <!--認証グリッド-->
-        <GroupBox Grid.Row="1" Header="{x:Static props:Resources.Text_Authentication}" Margin="5 5 5 0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="16"/>
-                    <RowDefinition Height="25"/>
-                </Grid.RowDefinitions>
+        <!--コンテンツグリッド-->
+        <Grid Grid.Row="1" Margin="0 5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="180"/>
+            </Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="100"/>
-                </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" MinWidth="500"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="2*" MinWidth="250"/>
+            </Grid.ColumnDefinitions>
 
-                <Grid.Resources>
-                    <Style x:Key="LoggedOutOnly" TargetType="Control">
-                        <Setter Property="IsEnabled" Value="{Binding IsLoggedIn, Converter={StaticResource BoolInvertConverter}}"/>
-                    </Style>
-                </Grid.Resources>
+            <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static props:Resources.Text_Username}"/>
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Username}"
+            <!--認証グリッド-->
+            <GroupBox Grid.Row="0" Header="{x:Static props:Resources.Text_Authentication}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.Resources>
+                        <Style x:Key="LoggedOutOnly" TargetType="Control">
+                            <Setter Property="IsEnabled" Value="{Binding IsLoggedIn, Converter={StaticResource BoolInvertConverter}}"/>
+                        </Style>
+                    </Grid.Resources>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static props:Resources.Text_Username}"/>
+                    <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Username}"
                          ToolTip="{x:Static props:Resources.Text_Username}" VerticalContentAlignment="Center"
                          Style="{StaticResource LoggedOutOnly}"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Static props:Resources.Text_Password}"/>
-                <PasswordBox Grid.Row="1" Grid.Column="1" ToolTip="{x:Static props:Resources.Text_Password}"
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Static props:Resources.Text_Password}"/>
+                    <PasswordBox Grid.Row="1" Grid.Column="1" ToolTip="{x:Static props:Resources.Text_Password}"
                              VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
-                    <behaviors:Interaction.Behaviors>
-                        <l:PasswordBoxBindingSupportBehavior Password="{Binding Password}"/>
-                    </behaviors:Interaction.Behaviors>
-                </PasswordBox>
+                        <behaviors:Interaction.Behaviors>
+                            <l:PasswordBoxBindingSupportBehavior Password="{Binding Password}"/>
+                        </behaviors:Interaction.Behaviors>
+                    </PasswordBox>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Static props:Resources.Text_MFACode}"/>
-                <PasswordBox Grid.Row="1" Grid.Column="2" ToolTip="{x:Static props:Resources.Text_MFACode}"
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Static props:Resources.Text_MFACode}"/>
+                    <PasswordBox Grid.Row="1" Grid.Column="2" ToolTip="{x:Static props:Resources.Text_MFACode}"
                              VerticalContentAlignment="Center" Style="{StaticResource LoggedOutOnly}">
-                    <behaviors:Interaction.Behaviors>
-                        <l:PasswordBoxBindingSupportBehavior Password="{Binding MFACode}"/>
-                    </behaviors:Interaction.Behaviors>
-                </PasswordBox>
+                        <behaviors:Interaction.Behaviors>
+                            <l:PasswordBoxBindingSupportBehavior Password="{Binding MFACode}"/>
+                        </behaviors:Interaction.Behaviors>
+                    </PasswordBox>
 
-                <Button Grid.Row="1" Grid.Column="3">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Content" Value="{x:Static props:Resources.Text_Login}"/>
-                            <Setter Property="Command" Value="{Binding LoginCommand}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsLoggedIn}" Value="True">
-                                    <Setter Property="Content" Value="{x:Static props:Resources.Text_Logout}"/>
-                                    <Setter Property="Command" Value="{Binding LogoutCommand}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </Grid>
-        </GroupBox>
-
-        <TabControl Grid.Row="2" Margin="5" IsEnabled="{Binding IsLoggedIn}">
-            <!--<TabItem Header="インスタンス管理">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="20"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0" DataContext="{Binding WorldInstanceManager, Mode=OneWay}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="150"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding WorldId}" ToolTip="World ID" VerticalContentAlignment="Center"/>
-                        <Button Grid.Column="1" Content="インスタンス管理開始" Command="{Binding StartManagementCommand}"/>
-                    </Grid>
-
-                    <ListBox Grid.Row="1" ItemsSource="{Binding WorldInstanceManager.Instances}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock>
-                                    <Run Text="{Binding InstanceId}"/>
-                                    <Run Text="{Binding UserNum, StringFormat={}{0}人}"/>
-                                </TextBlock>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <StatusBar Grid.Row="2">
-                        <Button Content="" Width="100" Height="10"
-                                Visibility="{Binding WorldInstanceManager.IsManaging, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    </StatusBar>
-                </Grid>
-            </TabItem>-->
-
-            <!--Inviteタブ-->
-            <TabItem Header="Invite">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <GroupBox Grid.Row="0" Header="{x:Static props:Resources.Text_WorldInstanceSetting}"
-                              Padding="0 5 0 0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="16"/>
-                                <RowDefinition Height="25"/>
-                                <RowDefinition Height="16"/>
-                                <RowDefinition Height="25"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_WorldId}" VerticalAlignment="Center"/>
-                            <Grid Grid.Row="1" Height="25">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="120"/>
-                                </Grid.ColumnDefinitions>
-
-                                <!--ワールドID入力欄-->
-                                <TextBox Grid.Column="0" Text="{Binding WorldIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
-                                         ToolTipService.ShowDuration="30000" >
-                                    <TextBox.ToolTip>
-                                        <TextBlock Text="{x:Static props:Resources.Tooltip_WorldIdOrUrl}"/>
-                                    </TextBox.ToolTip>
-                                </TextBox>
-                                <TextBlock Grid.Column="0" Text="例：wrld_ba913a96-fac4-4048-a062-9aa5db092812" VerticalAlignment="Center"
-                                           Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Hidden"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.WorldIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding DataContext.WorldIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-
-                                <ComboBox Grid.Column="1" SelectedValue="{Binding InstanceDisclosureRange}" ItemsSource="{Binding DisclosureRanges}"
-                                          VerticalContentAlignment="Center"/>
-                                <Button Grid.Column="2" Content="{x:Static props:Resources.Text_CreateInstance}"
-                                        Command="{Binding CreateWorldInstanceCommand}"/>
-                            </Grid>
-
-                            <!--ロケーションID入力欄-->
-                            <TextBlock Grid.Row="2" Text="{x:Static props:Resources.Text_LocationId}"
-                                       VerticalAlignment="Center"/>
-                            <Grid Grid.Row="3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="60"/>
-                                    <ColumnDefinition Width="60"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBox Grid.Column="0" Text="{Binding LocationIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
-                                         ToolTipService.ShowDuration="30000" Height="25">
-                                    <TextBox.ToolTip>
-                                        <TextBlock Text="{x:Static props:Resources.Tooltip_LocationIdOrUrl}"/>
-                                    </TextBox.ToolTip>
-                                </TextBox>
-                                <TextBlock Grid.Column="0" Text="例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)" VerticalAlignment="Center"
-                                           Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Hidden"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.LocationIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding DataContext.LocationIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-
-                                <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}"
-                                        ToolTip="{x:Static props:Resources.Text_CopyInstanceUrl}">
-                                    <Path Data="{StaticResource CopyLinkIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
-                                </Button>
-
-                                <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}"
-                                        ToolTip="{x:Static props:Resources.Text_LaunchInVRChat}">
-                                    <Path Data="{StaticResource OpenIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </GroupBox>
-
-                    <GroupBox Grid.Row="1" Header="{x:Static props:Resources.Text_SendTargetSetting}" Padding="0 5 0 0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="16"/>
-                                <RowDefinition Height="25"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="25"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_UserListFile}"
-                                       VerticalAlignment="Center"/>
-
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding UserListFilePath}" IsReadOnly="True"
-                                         VerticalContentAlignment="Center"/>
-                                <Button Grid.Column="1" Content="{x:Static props:Resources.Text_SelectFile}"
-                                        Command="{Binding SelectUserListFileCommand}"/>
-                            </Grid>
-
-                            <DataGrid Grid.Row="2" ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserResizeRows="False"
-                                      CanUserAddRows="False" IsReadOnly="True" VirtualizingPanel.ScrollUnit="Pixel">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static props:Resources.Text_Username}" Binding="{Binding Name}" MinWidth="60"/>
-                                    <DataGridTextColumn Header="{x:Static props:Resources.Text_ID}" Binding="{Binding Id}" Width="245" CanUserResize="False"/>
-
-                                    <!--Invite送信済みか-->
-                                    <DataGridTemplateColumn SortMemberPath="HasInvited" MinWidth="40">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Border Background="Transparent">
-                                                    <Path Data="{StaticResource InviteIcon}" Fill="{StaticResource LightBlueColorBrush}"
-                                                      VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="2">
-                                                        <Path.Style>
-                                                            <Style TargetType="Path">
-                                                                <Setter Property="Visibility" Value="Hidden"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding HasInvited}" Value="True">
-                                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Path.Style>
-                                                    </Path>
-
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_NotSentInviteYet}"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding HasInvited}" Value="True">
-                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_InviteSent}"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                </Border>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <!--ワールドにいるか-->
-                                    <DataGridTemplateColumn SortMemberPath="IsInWorld" MinWidth="40">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Border Background="Transparent">
-                                                    <Path Data="{StaticResource InWorldIcon}" VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="2">
-                                                        <Path.Style>
-                                                            <Style TargetType="Path">
-                                                                <Setter Property="Fill" Value="{StaticResource GrayColorBrush}"/>
-                                                                <Style.Triggers>
-                                                                    <MultiDataTrigger>
-                                                                        <MultiDataTrigger.Conditions>
-                                                                            <Condition Binding="{Binding IsInWorld}" Value="False"/>
-                                                                            <Condition Binding="{Binding IsOnline}" Value="True"/>
-                                                                        </MultiDataTrigger.Conditions>
-                                                                        <Setter Property="Fill" Value="{StaticResource OrangeColorBrush}"/>
-                                                                    </MultiDataTrigger>
-
-                                                                    <DataTrigger Binding="{Binding IsInWorld}" Value="True">
-                                                                        <Setter Property="Fill" Value="{StaticResource GreenColorBrush}"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Path.Style>
-                                                    </Path>
-
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserOffline}"/>
-                                                            <Style.Triggers>
-                                                                <MultiDataTrigger>
-                                                                    <MultiDataTrigger.Conditions>
-                                                                        <Condition Binding="{Binding IsInWorld}" Value="False"/>
-                                                                        <Condition Binding="{Binding IsOnline}" Value="True"/>
-                                                                    </MultiDataTrigger.Conditions>
-                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserNotInInstance}"/>
-                                                                </MultiDataTrigger>
-
-                                                                <DataTrigger Binding="{Binding IsInWorld}" Value="True">
-                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserInInstance}"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                </Border>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <!--滞在インスタンスチェックが予定されているか-->
-                                    <DataGridTemplateColumn SortMemberPath="IsLocationCheckScheduled" MinWidth="40">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Border Background="Transparent">
-                                                    <Path Data="{StaticResource ClockIcon}" Fill="{StaticResource FrenchBeigeColorBrush}"
-                                                          VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Margin="2">
-                                                        <Path.Style>
-                                                            <Style TargetType="Path">
-                                                                <Setter Property="Visibility" Value="Hidden"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsLocationCheckScheduled}" Value="True">
-                                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Path.Style>
-                                                    </Path>
-
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="ToolTip" Value="{x:Null}"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsLocationCheckScheduled}" Value="True">
-                                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_WaitingJoin}"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                </Border>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-
-                                <!--セルの垂直中央寄せ-->
-                                <DataGrid.Resources>
-                                    <Style TargetType="DataGridCell">
-                                        <Setter Property="Template">
+                    <Button Grid.Row="1" Grid.Column="3">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <Path Data="{StaticResource EnterIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_Login}"/>
+                                <Setter Property="Command" Value="{Binding LoginCommand}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLoggedIn}" Value="True">
+                                        <Setter Property="Content">
                                             <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                    <Grid Background="{TemplateBinding Background}">
-                                                        <ContentPresenter VerticalAlignment="Center"/>
-                                                    </Grid>
-                                                </ControlTemplate>
+                                                <Path Data="{StaticResource SignOutIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                             </Setter.Value>
                                         </Setter>
-                                    </Style>
-                                </DataGrid.Resources>
-                            </DataGrid>
-
-                            <!--Invite実行ボタン-->
-                            <Button Grid.Row="3" Command="{Binding InviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
-                                    <TextBlock Text="{x:Static props:Resources.Text_SendInvite}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
-
-                            <!--Invite中断ボタン-->
-                            <Button Grid.Row="3" Command="{Binding AbortInviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Path Data="{StaticResource AbortInviteIcon}" Fill="{StaticResource DefaultIconColorBrush}" Stretch="Uniform" Margin="4"/>
-                                    <TextBlock VerticalAlignment="Center">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="{x:Static props:Resources.Text_AbortInvite}"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsInviteAborting}" Value="True">
-                                                        <Setter Property="Text" Value="{x:Static props:Resources.Text_AbortingInvite}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </StackPanel>
-                            </Button>
-                        </Grid>
-                    </GroupBox>
+                                        <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_Logout}"/>
+                                        <Setter Property="Command" Value="{Binding LogoutCommand}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
-            </TabItem>
-        </TabControl>
+            </GroupBox>
 
-        <!--ログ-->
-        <Grid Grid.Row="3" Margin="5 0 5 5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="16"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="20"/>
-            </Grid.RowDefinitions>
+            <!--ワールド・インスタンス設定-->
+            <GroupBox Grid.Row="1" Header="{x:Static props:Resources.Text_WorldInstanceSetting}" IsEnabled="{Binding IsLoggedIn}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_Log}" VerticalAlignment="Center"/>
-            <ListBox Grid.Row="1" ItemsSource="{Binding Logs}" VirtualizingPanel.ScrollUnit="Pixel">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <DockPanel>
-                            <TextBlock Text="{Binding Time, StringFormat=HH:mm:ss}" Width="60" DockPanel.Dock="Left"/>
-                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" DockPanel.Dock="Right"/>
-                        </DockPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                    <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_WorldId}" VerticalAlignment="Center"/>
+                    <Grid Grid.Row="1" Height="25">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
 
-            <Button Grid.Row="2" Content="{x:Static props:Resources.Text_ClearLog}" Command="{Binding ClaerLogCommand}"/>
+                        <!--ワールドID入力欄-->
+                        <TextBox Grid.Column="0" Text="{Binding WorldIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                        ToolTipService.ShowDuration="30000" >
+                            <TextBox.ToolTip>
+                                <TextBlock Text="{x:Static props:Resources.Tooltip_WorldIdOrUrl}"/>
+                            </TextBox.ToolTip>
+                        </TextBox>
+                        <TextBlock Grid.Column="0" Text="例：wrld_ba913a96-fac4-4048-a062-9aa5db092812" VerticalAlignment="Center"
+                                        Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.WorldIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.WorldIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ComboBox Grid.Column="1" SelectedValue="{Binding InstanceDisclosureRange}" ItemsSource="{Binding DisclosureRanges}"
+                                        VerticalContentAlignment="Center"/>
+                        <Button Grid.Column="2" Content="{x:Static props:Resources.Text_CreateInstance}"
+                                    Command="{Binding CreateWorldInstanceCommand}"/>
+                    </Grid>
+
+                    <!--ロケーションID入力欄-->
+                    <TextBlock Grid.Row="2" Text="{x:Static props:Resources.Text_LocationId}"
+                                    VerticalAlignment="Center"/>
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Text="{Binding LocationIdOrUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"
+                                        ToolTipService.ShowDuration="30000" Height="25">
+                            <TextBox.ToolTip>
+                                <TextBlock Text="{x:Static props:Resources.Tooltip_LocationIdOrUrl}"/>
+                            </TextBox.ToolTip>
+                        </TextBox>
+                        <TextBlock Grid.Column="0" Text="例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)" VerticalAlignment="Center"
+                                        Margin="5 0 0 0" Foreground="Gray" IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.LocationIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.LocationIdOrUrl, RelativeSource={RelativeSource AncestorType=Window}}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <Button Grid.Column="1" Command="{Binding CopyInstanceLinkCommand}"
+                                ToolTip="{x:Static props:Resources.Text_CopyInstanceUrl}">
+                            <Path Data="{StaticResource CopyLinkIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                        </Button>
+
+                        <Button Grid.Column="2" Command="{Binding OpenInVRChatCommand}"
+                                    ToolTip="{x:Static props:Resources.Text_LaunchInVRChat}">
+                            <Path Data="{StaticResource OpenIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+
+            <!--送信先設定-->
+            <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="4" Header="{x:Static props:Resources.Text_SendTargetSetting}"
+                  IsEnabled="{Binding IsLoggedIn}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_UserListFile}"
+                                       VerticalAlignment="Center"/>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="60"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding UserListFilePath}" IsReadOnly="True"
+                                         VerticalContentAlignment="Center"/>
+                        <Button Grid.Column="1" Content="..." Command="{Binding SelectUserListFileCommand}"
+                            ToolTip="{x:Static props:Resources.Text_SelectFile}"/>
+                    </Grid>
+
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserResizeRows="False"
+                                      CanUserAddRows="False" IsReadOnly="True" VirtualizingPanel.ScrollUnit="Pixel">
+                        <DataGrid.Columns>
+                            <!--名前-->
+                            <DataGridTextColumn Header="{x:Static props:Resources.Text_Username}" Binding="{Binding Name}" MinWidth="60"/>
+
+                            <!--スタッフか-->
+                            <DataGridTemplateColumn SortMemberPath="IsStaff" MinWidth="40">
+                                <!--Header-->
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+
+                                <!--内容-->
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent">
+                                            <Path Data="{StaticResource FlagIcon}" Fill="{StaticResource DefaultIconColorBrush}"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16" Margin="4">
+                                                <Path.Style>
+                                                    <Style TargetType="Path">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsStaff}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="ToolTip" Value="{x:Null}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsStaff}" Value="True">
+                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserIsStaff}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            
+                            <!--ID-->
+                            <!--<DataGridTextColumn Header="{x:Static props:Resources.Text_ID}" Binding="{Binding Id}" Width="245" CanUserResize="False"/>-->
+
+                            <!--Invite送信済みか-->
+                            <DataGridTemplateColumn SortMemberPath="HasInvited" MinWidth="40">
+                                <!--Header-->
+                                <DataGridTemplateColumn.Header>
+                                    <Border>
+                                        <Path Data="{StaticResource InviteIcon}" Fill="{StaticResource GrayColorBrush}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16"/>
+                                    </Border>
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+
+                                <!--内容-->
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent">
+                                            <Path Data="{StaticResource InviteIcon}" Fill="{StaticResource LightBlueColorBrush}"
+                                                      VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16" Margin="4">
+                                                <Path.Style>
+                                                    <Style TargetType="Path">
+                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasInvited}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_NotSentInviteYet}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasInvited}" Value="True">
+                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_InviteSent}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!--ワールドにいるか-->
+                            <DataGridTemplateColumn SortMemberPath="IsInWorld" MinWidth="40">
+                                <!--Header-->
+                                <DataGridTemplateColumn.Header>
+                                    <Border Background="Transparent">
+                                        <Path Data="{StaticResource LocationIcon}" Fill="{StaticResource GrayColorBrush}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16"/>
+                                    </Border>
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+
+                                <!--内容-->
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent">
+                                            <Path VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16" Margin="4">
+                                                <Path.Style>
+                                                    <Style TargetType="Path">
+                                                        <Setter Property="Data" Value="{StaticResource LocationOffIcon}"/>
+                                                        <Setter Property="Fill" Value="{StaticResource GrayColorBrush}"/>
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding IsInWorld}" Value="False"/>
+                                                                    <Condition Binding="{Binding IsOnline}" Value="True"/>
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Data" Value="{StaticResource LocationIcon}"/>
+                                                                <Setter Property="Fill" Value="{StaticResource OrangeColorBrush}"/>
+                                                            </MultiDataTrigger>
+
+                                                            <DataTrigger Binding="{Binding IsInWorld}" Value="True">
+                                                                <Setter Property="Data" Value="{StaticResource LocationIcon}"/>
+                                                                <Setter Property="Fill" Value="{StaticResource GreenColorBrush}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserOffline}"/>
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsInWorld}" Value="False"/>
+                                                                <Condition Binding="{Binding IsOnline}" Value="True"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserNotInInstance}"/>
+                                                        </MultiDataTrigger>
+
+                                                        <DataTrigger Binding="{Binding IsInWorld}" Value="True">
+                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserInInstance}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+
+                        <!--セルの垂直中央寄せ-->
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <Grid Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.Resources>
+                    </DataGrid>
+
+                    <!--Invite実行ボタン-->
+                    <Button Grid.Row="3" Command="{Binding InviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                            <TextBlock Text="{x:Static props:Resources.Text_SendInvite}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!--Invite中断ボタン-->
+                    <Button Grid.Row="3" Command="{Binding AbortInviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{StaticResource AbortInviteIcon}" Fill="{StaticResource DefaultIconColorBrush}" Stretch="Uniform" Margin="4"/>
+                            <TextBlock VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{x:Static props:Resources.Text_AbortInvite}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsInviteAborting}" Value="True">
+                                                <Setter Property="Text" Value="{x:Static props:Resources.Text_AbortingInvite}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </GroupBox>
+
+            <!--ログ-->
+            <Grid Grid.Row="3" Margin="5 0 5 5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="{x:Static props:Resources.Text_Log}" VerticalAlignment="Center"/>
+                <ListBox Grid.Row="1" ItemsSource="{Binding Logs}" VirtualizingPanel.ScrollUnit="Pixel">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <TextBlock Text="{Binding Time, StringFormat=HH:mm:ss}" Width="60" DockPanel.Dock="Left"/>
+                                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" DockPanel.Dock="Right"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Button Grid.Row="2" Content="{x:Static props:Resources.Text_ClearLog}" Command="{Binding ClaerLogCommand}"/>
+            </Grid>
         </Grid>
 
         <!--<GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
         <Path Grid.Row="3" Data="{StaticResource SplitterMark}" Fill="Gray" VerticalAlignment="Top" HorizontalAlignment="Center"/>-->
 
         <!--ステータスバー-->
-        <StatusBar Grid.Row="4">
+        <StatusBar Grid.Row="2">
             <ProgressBar Width="100" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}"/>
             <ProgressBar Width="100" Height="10" Value="{Binding InviteProgress}" Visibility="{Binding IsInviting, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}">
                 <ProgressBar.ToolTip>

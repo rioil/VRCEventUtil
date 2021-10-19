@@ -161,6 +161,9 @@
   <data name="FileFilter_Exe" xml:space="preserve">
     <value>exeファイル (*.exe)|*.exe</value>
   </data>
+  <data name="FileFilter_JSON" xml:space="preserve">
+    <value>JSONファイル (*.json)|*.json</value>
+  </data>
   <data name="MenuTitle_File" xml:space="preserve">
     <value>ファイル(_F)</value>
   </data>
@@ -275,6 +278,9 @@
   </data>
   <data name="Text_UserInInstance" xml:space="preserve">
     <value>このユーザーはInvite先のインスタンスにいます．</value>
+  </data>
+  <data name="Text_UserIsStaff" xml:space="preserve">
+    <value>このユーザーはスタッフです．</value>
   </data>
   <data name="Text_UserListFile" xml:space="preserve">
     <value>ユーザーリストファイル</value>

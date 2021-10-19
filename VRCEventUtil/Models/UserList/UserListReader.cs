@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Linq;
-using CsvHelper;
+using System.Text.Json;
 
 namespace VRCEventUtil.Models.UserList
 {
@@ -17,18 +17,19 @@ namespace VRCEventUtil.Models.UserList
                 throw new FileNotFoundException();
             }
 
-            using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            var options = new JsonSerializerOptions
             {
-                var records = csv.GetRecords<InviteUser>().ToList();
-                var distinctedRecords = records.Distinct(new InviteUserComparer()).ToList();
-                if (records.Count != distinctedRecords.Count)
-                {
-                    Logger.Log($"ユーザーリストファイル {filePath} 読み込み時に，{records.Count() - distinctedRecords.Count}件の重複データを削除しました．");
-                }
-
-                return distinctedRecords;
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            var records = JsonSerializer.Deserialize<InviteUser[]>(File.ReadAllText(filePath), options).ToList();
+            var distinctedRecords = records.Distinct(new InviteUserComparer()).ToList();
+            if (records.Count != distinctedRecords.Count)
+            {
+                Logger.Log($"ユーザーリストファイル {filePath} 読み込み時に，{records.Count() - distinctedRecords.Count}件の重複データを削除しました．");
             }
+
+            return distinctedRecords;
         }
     }
 }

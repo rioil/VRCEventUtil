@@ -174,7 +174,6 @@ namespace VRCEventUtil.Models.Api
                         // 状態をリセット
                         user.IsInWorld = false;
                         user.HasInvited = false;
-                        user.IsLocationCheckScheduled = false;
 
                         // ユーザーのいるインスタンスを確認
                         var userInfo = await GetUserInfo(user.Id, cancellationToken);
@@ -203,7 +202,6 @@ namespace VRCEventUtil.Models.Api
 
                         ApiLog?.Invoke(string.Format(Resources.Success_InviteSentTo, user.Name));
                         user.HasInvited = true;
-                        user.IsLocationCheckScheduled = true;
                     }
                     finally
                     {

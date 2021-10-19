@@ -189,6 +189,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   JSONファイル (*.json)|*.json に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FileFilter_JSON {
+            get {
+                return ResourceManager.GetString("FileFilter_JSON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ファイル(_F) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MenuTitle_File {
@@ -522,6 +531,15 @@ namespace VRCEventUtil.Properties {
         public static string Text_UserInInstance {
             get {
                 return ResourceManager.GetString("Text_UserInInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   このユーザーはスタッフです． に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Text_UserIsStaff {
+            get {
+                return ResourceManager.GetString("Text_UserIsStaff", resourceCulture);
             }
         }
         
