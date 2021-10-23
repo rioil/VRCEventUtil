@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace VRCEventUtil.Models.Setting
 {
@@ -12,24 +12,27 @@ namespace VRCEventUtil.Models.Setting
     {
         public const string DEFAULT_SETTING_FILE_PATH = "settings.json";
 
-        public static string SettingFilePath { get; private set; }
+        public static string SettingFilePath { get; private set; } = default!;
 
-        public static AppSettings Settings { get; set; }
+        public static AppSettings Settings { get; set; } = default!;
 
         public static bool LoadSetting(string settingFilePath = DEFAULT_SETTING_FILE_PATH)
         {
             if (!File.Exists(settingFilePath))
             {
+                CreateDefaultSetting();
                 return false;
             }
 
             try
             {
                 var json = File.ReadAllText(settingFilePath);
-                Settings = JsonConvert.DeserializeObject<AppSettings>(json, new JsonSerializerSettings()
+                var options = new JsonSerializerOptions
                 {
-                    TypeNameHandling = TypeNameHandling.Auto
-                });
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                };
+                Settings = JsonSerializer.Deserialize<AppSettings>(json, options);
             }
             catch (Exception ex)
             {
@@ -44,10 +47,12 @@ namespace VRCEventUtil.Models.Setting
 
         public static bool SaveSetting(string settingFilePath = DEFAULT_SETTING_FILE_PATH)
         {
-            var json = JsonConvert.SerializeObject(Settings, Formatting.Indented, new JsonSerializerSettings()
+            var options = new JsonSerializerOptions
             {
-                TypeNameHandling = TypeNameHandling.Auto
-            });
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            var json = JsonSerializer.Serialize(Settings, options);
             try
             {
                 File.WriteAllText(settingFilePath, json);
@@ -72,8 +77,14 @@ namespace VRCEventUtil.Models.Setting
         /// <summary>
         /// steam.exeのパスを自動設定します．
         /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public static void AutoSetSteamExePath()
         {
+            if (Settings is null || SettingFilePath is null)
+            {
+                throw new InvalidOperationException();
+            }
+
             if (!File.Exists(Settings.SteamExePath))
             {
                 Settings.SteamExePath = SearchSteamExe();
@@ -86,7 +97,7 @@ namespace VRCEventUtil.Models.Setting
         /// steam.exeを検索してパスを取得します．
         /// </summary>
         /// <returns>パス．見つからなければnull</returns>
-        private static string SearchSteamExe()
+        private static string? SearchSteamExe()
         {
             const string DEFAULT_PATH = @"C:\Program Files (x86)\Steam\steam.exe";
             if (File.Exists(DEFAULT_PATH))
@@ -95,21 +106,6 @@ namespace VRCEventUtil.Models.Setting
             }
 
             return null;
-        }
-    }
-
-    public class ConcreteConverter<T> : JsonConverter
-    {
-        public override bool CanConvert(Type objectType) => true;
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return serializer.Deserialize<T>(reader);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            serializer.Serialize(writer, value);
         }
     }
 }

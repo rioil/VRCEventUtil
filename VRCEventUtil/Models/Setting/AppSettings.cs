@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 using Livet;
-using Newtonsoft.Json;
 
 namespace VRCEventUtil.Models.Setting
 {
@@ -52,7 +52,7 @@ namespace VRCEventUtil.Models.Setting
         /// <summary>
         /// SteamのEXEファイルのパス
         /// </summary>
-        public string SteamExePath
+        public string? SteamExePath
         {
             get => _steamExePath;
             set
@@ -63,7 +63,7 @@ namespace VRCEventUtil.Models.Setting
                 }
             }
         }
-        private string _steamExePath;
+        private string? _steamExePath;
 
         /// <summary>
         /// VRChatの起動にVRModeを使用するか
@@ -86,6 +86,6 @@ namespace VRCEventUtil.Models.Setting
         /// 設定の簡易コピーを作成します．
         /// </summary>
         /// <returns></returns>
-        public AppSettings ShallowCopy() => MemberwiseClone() as AppSettings;
+        public AppSettings ShallowCopy() => (AppSettings)MemberwiseClone();
     }
 }

@@ -5,8 +5,6 @@ using System.Text;
 using Livet;
 using System.Text.Json.Serialization;
 
-#nullable enable
-
 namespace VRCEventUtil.Models.UserList
 {
     /// <summary>

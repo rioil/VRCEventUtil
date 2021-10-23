@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 using System.Windows.Data;
 
 namespace VRCEventUtil.Converters
@@ -14,21 +15,34 @@ namespace VRCEventUtil.Converters
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string))
+            if (value is Enum eVal)
             {
-                var fieldInfo = value.GetType().GetField(value.ToString());
-                if (fieldInfo.GetCustomAttribute<EnumDisplayNameAttribute>() is EnumDisplayNameAttribute attr)
+
+                if (destinationType == typeof(string))
                 {
-                    return attr.DisplayName;
+                    var fieldInfo = eVal.GetType().GetField(eVal.ToString());
+                    if (fieldInfo is null)
+                    {
+                        return eVal.ToString();
+                    }
+
+                    if (fieldInfo.GetCustomAttribute<EnumDisplayNameAttribute>() is EnumDisplayNameAttribute attr)
+                    {
+                        return attr.DisplayName;
+                    }
+                    else
+                    {
+                        return eVal.ToString();
+                    }
                 }
                 else
                 {
-                    return value.ToString();
+                    throw new NotSupportedException();
                 }
             }
             else
             {
-                throw new NotSupportedException();
+                return DependencyProperty.UnsetValue;
             }
         }
     }

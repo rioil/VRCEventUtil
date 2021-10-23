@@ -145,6 +145,9 @@
   <data name="Fail_AutoLogin" xml:space="preserve">
     <value>自動ログインに失敗しました．ログインが必要です．</value>
   </data>
+  <data name="Fail_CreateInstance" xml:space="preserve">
+    <value>インスタンスの作成に失敗しました．</value>
+  </data>
   <data name="Fail_Invite" xml:space="preserve">
     <value>Inviteに失敗しました．</value>
   </data>

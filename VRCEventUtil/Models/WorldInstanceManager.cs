@@ -19,22 +19,22 @@ namespace VRCEventUtil.Models
         /// <summary>
         /// ワールドID
         /// </summary>
-        public string WorldId
+        public string? WorldIdOrUrl
         {
             get => _worldId;
             set => RaisePropertyChangedIfSet(ref _worldId, value);
         }
-        private string _worldId;
+        private string? _worldId;
 
         /// <summary>
         /// インスタンスリスト
         /// </summary>
-        public ObservableCollection<WorldInstance> Instances
+        public ObservableCollection<WorldInstance>? Instances
         {
             get => _instances;
             set => RaisePropertyChangedIfSet(ref _instances, value);
         }
-        private ObservableCollection<WorldInstance> _instances;
+        private ObservableCollection<WorldInstance>? _instances;
 
 
         /// <summary>
@@ -54,12 +54,25 @@ namespace VRCEventUtil.Models
         /// </summary>
         public void StartManagement()
         {
-            var info = ApiManager.Instance.GetWorldInfo(WorldId);
-            if (info is null) { return; }
-            Instances = new ObservableCollection<WorldInstance>(info.Instances.Select(instance => new WorldInstance(WorldId, instance.FirstOrDefault().ToString())));
+            if (!ApiUtil.TryParseWorldId(WorldIdOrUrl, out var worldId))
+            {
+                // TODO 通知
+                return;
+            }
+            var info = ApiManager.Instance.GetWorldInfo(worldId);
+            if (info is null || !info.Instances.Any()) { return; }
+
+            var instances = new ObservableCollection<WorldInstance>();
+            foreach (var instance in info.Instances)
+            {
+                var instanceId = instance.FirstOrDefault().ToString();
+                if (instanceId is null) { continue; }
+                instances.Add(new WorldInstance(worldId, instanceId));
+            }
+            Instances = instances;
             IsManaging = true;
         }
-        private ViewModelCommand _startManagementCommand;
+        private ViewModelCommand? _startManagementCommand;
         public ViewModelCommand StartManagementCommand => _startManagementCommand ??= new ViewModelCommand(StartManagement);
 
         /// <summary>
@@ -69,7 +82,7 @@ namespace VRCEventUtil.Models
         {
             IsManaging = false;
         }
-        private ViewModelCommand _stopManagementCommand;
+        private ViewModelCommand? _stopManagementCommand;
         public ViewModelCommand StopManagementCommand => _stopManagementCommand ??= new ViewModelCommand(StopManagement);
         #endregion コマンド
     }
@@ -97,7 +110,7 @@ namespace VRCEventUtil.Models
             get => _worldId;
             set => RaisePropertyChangedIfSet(ref _worldId, value);
         }
-        private string _worldId;
+        private string _worldId = default!;
 
         /// <summary>
         /// Instance ID
@@ -107,7 +120,7 @@ namespace VRCEventUtil.Models
             get => _instanceId;
             set => RaisePropertyChangedIfSet(ref _instanceId, value);
         }
-        private string _instanceId;
+        private string _instanceId = default!;
 
         /// <summary>
         /// ユーザー数

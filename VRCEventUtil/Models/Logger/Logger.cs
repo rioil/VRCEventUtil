@@ -25,8 +25,14 @@ namespace VRCEventUtil.Models
             }
         }
 
-        public static void Log(Exception exception, DateTime? dateTime = null)
+        public static void Log(Exception? exception, DateTime? dateTime = null)
         {
+            if (exception is null)
+            {
+                Log("不明なエラーが発生しました．");
+                return;
+            }
+
             dateTime ??= DateTime.Now;
             var contents = exception.ToString().Split(Environment.NewLine).Select(line => $"{dateTime},{line}");
             try

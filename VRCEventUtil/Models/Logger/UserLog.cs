@@ -32,7 +32,7 @@ namespace VRCEventUtil.Models
             get => _message;
             set => RaisePropertyChangedIfSet(ref _message, value);
         }
-        private string _message;
+        private string _message = default!;
 
         /// <summary>
         /// 時間

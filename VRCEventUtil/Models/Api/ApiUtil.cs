@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 using VRCEventUtil.Properties;
@@ -18,7 +19,11 @@ namespace VRCEventUtil.Models.Api
         /// </summary>
         /// <param name="locationIdOrUrl"></param>
         /// <returns></returns>
-        public static bool ValidateLocationIdOrUrl(string locationIdOrUrl) => Regex.IsMatch(locationIdOrUrl, LAUNCH_URL_PATTERN) || Regex.IsMatch(locationIdOrUrl, LOCATION_ID_PATTERN);
+        public static bool ValidateLocationIdOrUrl(string? locationIdOrUrl)
+        {
+            if (locationIdOrUrl is null) { return false; }
+            return Regex.IsMatch(locationIdOrUrl, LAUNCH_URL_PATTERN) || Regex.IsMatch(locationIdOrUrl, LOCATION_ID_PATTERN);
+        }
 
         /// <summary>
         /// Location IDを解析します．
@@ -26,7 +31,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="locationIdOrUrl"></param>
         /// <param name="locationId"></param>
         /// <returns></returns>
-        public static bool TryParseLocationIdOrUrl(string locationIdOrUrl, out string locationId)
+        public static bool TryParseLocationIdOrUrl(string? locationIdOrUrl, [NotNullWhen(true)] out string? locationId)
         {
             if (string.IsNullOrWhiteSpace(locationIdOrUrl))
             {
@@ -111,7 +116,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="worldId"></param>
         /// <param name="instanceId"></param>
         /// <returns></returns>
-        public static bool TryResolveLocationIdOrUrl(string locationIdOrUrl, out string worldId, out string instanceId)
+        public static bool TryResolveLocationIdOrUrl(string? locationIdOrUrl, [NotNullWhen(true)] out string? worldId, [NotNullWhen(true)] out string? instanceId)
         {
             if (locationIdOrUrl is null)
             {
@@ -147,11 +152,11 @@ namespace VRCEventUtil.Models.Api
         /// <param name="worldIdOrUrl"></param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
-        public static string ParseWorldId(string worldIdOrUrl)
+        public static string ParseWorldId(string? worldIdOrUrl)
         {
             if (Regex.IsMatch(worldIdOrUrl, WORLD_ID_PATTERN))
             {
-                return worldIdOrUrl;
+                return worldIdOrUrl!;
             }
 
             var match = Regex.Match(worldIdOrUrl, WORLD_URL_PATTERN);
@@ -168,8 +173,14 @@ namespace VRCEventUtil.Models.Api
         /// </summary>
         /// <param name="worldIdOrUrl"></param>
         /// <returns></returns>
-        public static bool TryParseWorldId(string worldIdOrUrl, out string worldId)
+        public static bool TryParseWorldId(string? worldIdOrUrl, [NotNullWhen(true)] out string? worldId)
         {
+            if (worldIdOrUrl is null)
+            {
+                worldId = null;
+                return false;
+            }
+
             if (Regex.IsMatch(worldIdOrUrl, WORLD_ID_PATTERN))
             {
                 worldId = worldIdOrUrl;
@@ -192,8 +203,9 @@ namespace VRCEventUtil.Models.Api
         /// </summary>
         /// <param name="worldIdOrUrl"></param>
         /// <returns></returns>
-        public static bool ValidateWorldIdOrUrl(string worldIdOrUrl)
+        public static bool ValidateWorldIdOrUrl(string? worldIdOrUrl)
         {
+            if (worldIdOrUrl is null) { return false; }
             if (Regex.IsMatch(worldIdOrUrl, WORLD_ID_PATTERN)) { return true; }
             if (Regex.IsMatch(worldIdOrUrl, WORLD_URL_PATTERN)) { return true; }
 

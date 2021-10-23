@@ -29,10 +29,8 @@ namespace VRCEventUtil.ViewModels
         public async void Initialize()
         {
             IsLoading = true;
-            if (!SettingManager.LoadSetting())
-            {
-                SettingManager.CreateDefaultSetting();
-            }
+            Users = new ObservableCollection<InviteUser>();
+            SettingManager.LoadSetting();
 
             Username = Settings.Default.Username;
             ApiManager.Instance.ApiLog += msg => DispatcherHelper.UIDispatcher.Invoke(() => Log(msg));
@@ -55,7 +53,7 @@ namespace VRCEventUtil.ViewModels
         /// <summary>
         /// Invite中断用キャンセルトークンソース
         /// </summary>
-        CancellationTokenSource _inviteCancellationTokenSrc;
+        CancellationTokenSource? _inviteCancellationTokenSrc;
         #endregion メンバ変数
 
         #region プロパティ
@@ -79,32 +77,32 @@ namespace VRCEventUtil.ViewModels
             get => _username;
             set => RaisePropertyChangedIfSet(ref _username, value);
         }
-        private string _username;
+        private string _username = string.Empty;
 
         /// <summary>
         /// パスワード
         /// </summary>
-        public string Password
+        public string? Password
         {
             get => _password;
             set => RaisePropertyChangedIfSet(ref _password, value);
         }
-        private string _password;
+        private string? _password;
 
         /// <summary>
         /// 二要素認証コード
         /// </summary>
-        public string MFACode
+        public string? MFACode
         {
             get => _MFACode;
             set => RaisePropertyChangedIfSet(ref _MFACode, value);
         }
-        private string _MFACode;
+        private string? _MFACode;
 
         /// <summary>
         /// ロケーションID/URL
         /// </summary>
-        public string LocationIdOrUrl
+        public string? LocationIdOrUrl
         {
             get => _locationIdOrUrl;
             set
@@ -115,22 +113,22 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private string _locationIdOrUrl;
+        private string? _locationIdOrUrl;
 
         /// <summary>
         /// ユーザーID
         /// </summary>
-        public string UserId
+        public string? UserId
         {
             get => _userId;
             set => RaisePropertyChangedIfSet(ref _userId, value);
         }
-        private string _userId;
+        private string? _userId;
 
         /// <summary>
         /// ワールドID/URL
         /// </summary>
-        public string WorldIdOrUrl
+        public string? WorldIdOrUrl
         {
             get => _worldIdOrUrl;
             set
@@ -141,7 +139,7 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private string _worldIdOrUrl;
+        private string? _worldIdOrUrl;
 
         /// <summary>
         /// ログ
@@ -176,12 +174,12 @@ namespace VRCEventUtil.ViewModels
         /// <summary>
         /// ユーザーリストファイルパス
         /// </summary>
-        public string UserListFilePath
+        public string? UserListFilePath
         {
             get => _userListFilePath;
             set
             {
-                if (RaisePropertyChangedIfSet(ref _userListFilePath, value))
+                if (RaisePropertyChangedIfSet(ref _userListFilePath, value) && value is object)
                 {
                     Task.Run(() =>
                     {
@@ -194,7 +192,7 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private string _userListFilePath;
+        private string? _userListFilePath;
 
         /// <summary>
         /// ユーザーリスト
@@ -211,7 +209,7 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private ObservableCollection<InviteUser> _users;
+        private ObservableCollection<InviteUser> _users = default!;
 
         /// <summary>
         /// インスタンスの公開範囲
@@ -296,7 +294,7 @@ namespace VRCEventUtil.ViewModels
                     Resources.Title_Error, MessageBoxImage.Warning, "InformationMessage"));
             }
         }
-        private ViewModelCommand _loginCommand;
+        private ViewModelCommand? _loginCommand;
         public ViewModelCommand LoginCommand => _loginCommand ??= new ViewModelCommand(Login);
 
         /// <summary>
@@ -308,7 +306,7 @@ namespace VRCEventUtil.ViewModels
             ApiManager.Instance.Logout();
             Log(Resources.Success_Logout);
         }
-        private ViewModelCommand _logoutCommand;
+        private ViewModelCommand? _logoutCommand;
         public ViewModelCommand LogoutCommand => _logoutCommand ??= new ViewModelCommand(Logout);
 
         /// <summary>
@@ -324,9 +322,16 @@ namespace VRCEventUtil.ViewModels
 
             var progress = new Progress<double>();
             progress.ProgressChanged += (_, val) => DispatcherHelper.UIDispatcher.Invoke(() => InviteProgress = (int)val);
+
+            if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
+            {
+                Log(Resources.Fail_Invite);
+                return;
+            }
+
             try
             {
-                var result = await ApiManager.Instance.Invite(LocationIdOrUrl, Users, progress, _inviteCancellationTokenSrc.Token);
+                var result = await ApiManager.Instance.Invite(locationId, Users, progress, _inviteCancellationTokenSrc.Token);
                 if (result)
                 {
                     Log(Resources.Success_Invite);
@@ -345,7 +350,7 @@ namespace VRCEventUtil.ViewModels
         }
 
         public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(LocationIdOrUrl) && Users is object && Users.Any();
-        private ViewModelCommand _inviteCommand;
+        private ViewModelCommand? _inviteCommand;
         public ViewModelCommand InviteCommand => _inviteCommand ??= new ViewModelCommand(Invite, CanInvite);
 
         /// <summary>
@@ -354,11 +359,11 @@ namespace VRCEventUtil.ViewModels
         public void AbortInvite()
         {
             IsInviteAborting = true;
-            _inviteCancellationTokenSrc.Cancel();
+            _inviteCancellationTokenSrc?.Cancel();
             Log(Resources.Aborting_Invite);
         }
         private bool CanAbortInvite() => IsInviting && !IsInviteAborting;
-        private ViewModelCommand _abortInviteCommand;
+        private ViewModelCommand? _abortInviteCommand;
 
         public ViewModelCommand AbortInviteCommand => _abortInviteCommand ??= new ViewModelCommand(AbortInvite, CanAbortInvite);
 
@@ -367,9 +372,17 @@ namespace VRCEventUtil.ViewModels
         /// </summary>
         public async void CreateWorldInstance()
         {
+            if (!ApiUtil.TryParseWorldId(WorldIdOrUrl, out var worldId))
+            {
+                Log(Resources.Error_InvalidWorldIdOrUrl);
+                Messenger.Raise(new InformationMessage(Resources.Error_InvalidWorldIdOrUrl, Resources.Title_Error,
+                    MessageBoxImage.Warning, "InformationMessage"));
+                return;
+            }
+
             try
             {
-                LocationIdOrUrl = await ApiManager.Instance.CreateWorldInstance(WorldIdOrUrl, InstanceRegion, InstanceDisclosureRange);
+                LocationIdOrUrl = await ApiManager.Instance.CreateWorldInstance(worldId, InstanceRegion, InstanceDisclosureRange);
             }
             catch (FormatException)
             {
@@ -384,12 +397,18 @@ namespace VRCEventUtil.ViewModels
                 return;
             }
 
+            if (LocationIdOrUrl is null)
+            {
+                Log(Resources.Fail_CreateInstance);
+                return;
+            }
+
             var instanceId = ApiUtil.ResolveLocationIdOrUrl(LocationIdOrUrl).InstanceId;
             Log(string.Format(Resources.Success_CreateInstance, InstanceRegion, InstanceDisclosureRange, WorldIdOrUrl, instanceId));
         }
         public bool CanCreateWorldInstance() => !string.IsNullOrWhiteSpace(WorldIdOrUrl);
         public ViewModelCommand CreateWorldInstanceCommand => _createWorldInstanceCommand ??= new ViewModelCommand(CreateWorldInstance, CanCreateWorldInstance);
-        private ViewModelCommand _createWorldInstanceCommand;
+        private ViewModelCommand? _createWorldInstanceCommand;
 
         /// <summary>
         /// ユーザーリストファイル選択ダイアログを表示します．
@@ -408,7 +427,7 @@ namespace VRCEventUtil.ViewModels
                 UserListFilePath = dialog.Response[0];
             }
         }
-        private ViewModelCommand _selectUserListFileCommand;
+        private ViewModelCommand? _selectUserListFileCommand;
         public ViewModelCommand SelectUserListFileCommand => _selectUserListFileCommand ??= new ViewModelCommand(SelectUserListFile);
 
         /// <summary>
@@ -418,7 +437,7 @@ namespace VRCEventUtil.ViewModels
         {
             Logs.Clear();
         }
-        private ViewModelCommand _claerLogCommand;
+        private ViewModelCommand? _claerLogCommand;
         public ViewModelCommand ClaerLogCommand => _claerLogCommand ??= new ViewModelCommand(ClaerLog);
 
 
@@ -460,7 +479,7 @@ namespace VRCEventUtil.ViewModels
                 Log(Resources.Fail_LauchVRChat);
             }
         }
-        private ViewModelCommand _openInVRChatCommand;
+        private ViewModelCommand? _openInVRChatCommand;
         public ViewModelCommand OpenInVRChatCommand => _openInVRChatCommand ??= new ViewModelCommand(OpenInVRChat);
 
         /// <summary>
@@ -480,7 +499,7 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private ViewModelCommand _copyInstanceLinkCommand;
+        private ViewModelCommand? _copyInstanceLinkCommand;
         public ViewModelCommand CopyInstanceLinkCommand => _copyInstanceLinkCommand ??= new ViewModelCommand(CopyInstanceLink);
 
         #region メニュー
@@ -491,7 +510,7 @@ namespace VRCEventUtil.ViewModels
         {
             Messenger.Raise(new TransitionMessage(typeof(SettingWindow), new SettingWindowViewModel(), TransitionMode.Modal, "WindowInteraction"));
         }
-        private ViewModelCommand _openSettingWindowCommand;
+        private ViewModelCommand? _openSettingWindowCommand;
         public ViewModelCommand OpenSettingWindowCommand => _openSettingWindowCommand ??= new ViewModelCommand(OpenSettingWindow);
 
         #endregion メニュー
@@ -508,7 +527,9 @@ namespace VRCEventUtil.ViewModels
 
         private void Log(object msg)
         {
-            Log(msg?.ToString());
+            var tmp = msg?.ToString();
+            if (tmp is null) { return; }
+            Log(tmp);
         }
         #endregion 内部関数
     }

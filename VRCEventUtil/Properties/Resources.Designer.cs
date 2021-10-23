@@ -143,6 +143,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   インスタンスの作成に失敗しました． に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Fail_CreateInstance {
+            get {
+                return ResourceManager.GetString("Fail_CreateInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Inviteに失敗しました． に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Fail_Invite {

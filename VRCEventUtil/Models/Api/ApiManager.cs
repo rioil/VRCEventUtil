@@ -26,6 +26,13 @@ namespace VRCEventUtil.Models.Api
         private const string API_DOMAIN = "api.vrchat.cloud";
         #endregion 定数
 
+        #region メンバ変数
+        private readonly BlockingCollection<CountdownEvent> _apiCallRequests = new BlockingCollection<CountdownEvent>();
+        private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+        private AuthenticationApi _authApi = new AuthenticationApi();
+        private DateTime _lastApiCallTime;
+        #endregion メンバ変数
+
         #region コンストラクタ・破棄処理
         private ApiManager()
         {
@@ -56,42 +63,34 @@ namespace VRCEventUtil.Models.Api
                 }
             }, token);
         }
-
         public void Dispose()
         {
             _tokenSource?.Cancel();
         }
         #endregion コンストラクタ・破棄処理
 
-        #region メンバ変数
-        private AuthenticationApi _authApi;
-        private DateTime _lastApiCallTime;
-        private readonly BlockingCollection<CountdownEvent> _apiCallRequests = new BlockingCollection<CountdownEvent>();
-        private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
-        #endregion メンバ変数
-
         #region プロパティ
         /// <summary>
         /// インスタンス
         /// </summary>
         public static ApiManager Instance => _instance ??= new ApiManager();
-        private static ApiManager _instance;
+        private static ApiManager? _instance;
 
         /// <summary>
         /// 現在のユーザー
         /// </summary>
-        public CurrentUser CurrentUser { get; private set; }
+        public CurrentUser? CurrentUser { get; private set; }
         #endregion プロパティ
 
         #region イベント
         /// <summary>
         /// 
         /// </summary>
-        public event Action<string> ApiLog;
+        public event Action<string>? ApiLog;
         #endregion イベント
 
         #region メソッド
-        public async Task<bool> Login(string username, string password, string mfaCode = null)
+        public async Task<bool> Login(string username, string? password, string? mfaCode = null)
         {
             Configuration.Default.Username = username;
 
@@ -100,9 +99,12 @@ namespace VRCEventUtil.Models.Api
                 return true;
             }
 
+            if (password is null) { return false; }
+
             ClearAuthSettings();
             Configuration.Default.Password = password;
-            _authApi = new AuthenticationApi();
+            _authApi.Configuration.Username = username;
+            _authApi.Configuration.Password = password;
 
             try
             {
@@ -130,7 +132,7 @@ namespace VRCEventUtil.Models.Api
 
         public void Logout()
         {
-            _authApi.Logout();
+            _authApi?.Logout();
             ClearAuthSettings();
             Configuration.Default.Password = string.Empty;
         }
@@ -148,20 +150,8 @@ namespace VRCEventUtil.Models.Api
         {
             return await Task.Run(async () =>
             {
-                // インスタンスID解析
-                string formattedInstanceId;
-                try
-                {
-                    formattedInstanceId = ApiUtil.ConvertToLocationId(locationId);
-                }
-                catch (Exception ex) when (ex is FormatException || ex is ArgumentNullException)
-                {
-                    Logger.Log(ex);
-                    return false;
-                }
-
                 var apiInstance = new InviteApi(_authApi.Configuration);
-                var inviteRequest = new InviteRequest(formattedInstanceId);
+                var inviteRequest = new InviteRequest(locationId);
 
                 // Invite実行
                 int userCount = 0;
@@ -177,6 +167,7 @@ namespace VRCEventUtil.Models.Api
 
                         // ユーザーのいるインスタンスを確認
                         var userInfo = await GetUserInfo(user.Id, cancellationToken);
+                        if (userInfo is null) { continue; }
                         user.Name = userInfo.DisplayName;
 
                         var loc = userInfo.Location;
@@ -219,7 +210,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="userId"></param>
         /// <returns></returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<User> GetUserInfo(string userId, CancellationToken cancellationToken)
+        public async Task<User?> GetUserInfo(string userId, CancellationToken cancellationToken)
         {
             var apiInstance = new UsersApi(_authApi.Configuration);
 
@@ -240,7 +231,7 @@ namespace VRCEventUtil.Models.Api
         /// </summary>
         /// <param name="worldId"></param>
         /// <returns></returns>
-        public World GetWorldInfo(string worldId)
+        public World? GetWorldInfo(string worldId)
         {
             var apiInstance = new WorldsApi(_authApi.Configuration);
 
@@ -259,20 +250,18 @@ namespace VRCEventUtil.Models.Api
         /// <summary>
         /// ワールドのインスタンスを作成します．
         /// </summary>
-        /// <param name="worldIdOrUrl"></param>
+        /// <param name="worldId"></param>
         /// <param name="region"></param>
         /// <param name="disclosureRange"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<string> CreateWorldInstance(string worldIdOrUrl, ERegion region = ERegion.JP,
+        public async Task<string?> CreateWorldInstance(string worldId, ERegion region = ERegion.JP,
             EDisclosureRange disclosureRange = EDisclosureRange.Invite, CancellationToken? cancellationToken = null)
         {
             return await Task.Run(async () =>
             {
-                var worldId = ApiUtil.ParseWorldId(worldIdOrUrl);
-
                 try
                 {
                     WaitApiCallInterval(cancellationToken);
@@ -295,7 +284,7 @@ namespace VRCEventUtil.Models.Api
         /// </summary>
         /// <param name="locationId"></param>
         /// <returns></returns>
-        public Instance GetWorldInstance(string locationId)
+        public Instance? GetWorldInstance(string locationId)
         {
             string worldId;
             string instanceId;
@@ -319,7 +308,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="worldId"></param>
         /// <param name="instanceId"></param>
         /// <returns></returns>
-        public Instance GetWorldInstance(string worldId, string instanceId)
+        public Instance? GetWorldInstance(string worldId, string instanceId)
         {
             var apiInstance = new WorldsApi(_authApi.Configuration);
 

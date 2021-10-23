@@ -30,7 +30,7 @@ namespace VRCEventUtil.ViewModels
             get => _settings;
             set => RaisePropertyChangedIfSet(ref _settings, value);
         }
-        private AppSettings _settings;
+        private AppSettings _settings = default!;
 
         #region コマンド
 
@@ -51,7 +51,7 @@ namespace VRCEventUtil.ViewModels
                 Settings.SteamExePath = dialog.Response[0];
             }
         }
-        private ViewModelCommand _selectSteamExePathCommand;
+        private ViewModelCommand? _selectSteamExePathCommand;
         public ViewModelCommand SelectSteamExePathCommand => _selectSteamExePathCommand ??= new ViewModelCommand(SelectSteamExePath);
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace VRCEventUtil.ViewModels
             SettingManager.SaveSetting();
             Messenger.Raise(new InteractionMessage("CloseWindow"));
         }
-        private ViewModelCommand _saveCommand;
+        private ViewModelCommand? _saveCommand;
         public ViewModelCommand SaveCommand => _saveCommand ??= new ViewModelCommand(Save);
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace VRCEventUtil.ViewModels
 
             Messenger.Raise(new InteractionMessage("CloseWindow"));
         }
-        private ViewModelCommand _cancelCommand;
+        private ViewModelCommand? _cancelCommand;
         public ViewModelCommand CancelCommand => _cancelCommand ??= new ViewModelCommand(Cancel);
 
         #endregion コマンド
