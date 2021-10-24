@@ -250,7 +250,7 @@
                     </Grid>
 
                     <DataGrid Grid.Row="2" ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserResizeRows="False"
-                                      CanUserAddRows="False" IsReadOnly="True" VirtualizingPanel.ScrollUnit="Pixel">
+                              CanUserAddRows="False" IsReadOnly="True" VirtualizingPanel.ScrollUnit="Pixel" Margin="0 5 0 0">
                         <!--セルの垂直中央寄せ-->
                         <DataGrid.Resources>
                             <Style TargetType="{x:Type DataGridCell}">
@@ -265,7 +265,7 @@
                                 </Setter>
                             </Style>
                         </DataGrid.Resources>
-                        
+
                         <DataGrid.Columns>
                             <!--名前-->
                             <DataGridTextColumn Header="{x:Static props:Resources.Text_Username}" Binding="{Binding Name}" MinWidth="60"/>
@@ -325,7 +325,7 @@
                                               VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16"/>
                                     </Border>
                                 </DataGridTemplateColumn.Header>
-                                
+
                                 <DataGridTemplateColumn.HeaderStyle>
                                     <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MahApps.Styles.DataGridColumnHeader}">
                                         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -375,7 +375,7 @@
                                               VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16"/>
                                     </Border>
                                 </DataGridTemplateColumn.Header>
-                                
+
                                 <DataGridTemplateColumn.HeaderStyle>
                                     <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MahApps.Styles.DataGridColumnHeader}">
                                         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -469,15 +469,15 @@
             <!--ログ-->
             <GroupBox Grid.Row="3" Header="{x:Static props:Resources.Text_Log}">
                 <ListBox ItemsSource="{Binding Logs}" VirtualizingPanel.ScrollUnit="Pixel" av:ItemsSource="{av:SampleData ItemCount=5}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Time, StringFormat=HH:mm:ss}" Width="60" DockPanel.Dock="Left"/>
-                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" DockPanel.Dock="Right"/>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <TextBlock Text="{Binding Time, StringFormat=HH:mm:ss}" Width="60" DockPanel.Dock="Left"/>
+                                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" DockPanel.Dock="Right"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </GroupBox>
             <Button Grid.Row="3" ToolTip="{x:Static props:Resources.Text_ClearLog}"
                     Command="{Binding ClaerLogCommand}"
@@ -485,7 +485,7 @@
                     Style="{StaticResource MahApps.Styles.Button.WindowCommands}" Margin="0 5 0 0">
                 <iconPacks:PackIconMaterialDesign Kind="ClearAll" />
             </Button>
-        </Grid> 
+        </Grid>
 
         <!--<GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
         <Path Grid.Row="3" Data="{StaticResource SplitterMark}" Fill="Gray" VerticalAlignment="Top" HorizontalAlignment="Center"/>-->
