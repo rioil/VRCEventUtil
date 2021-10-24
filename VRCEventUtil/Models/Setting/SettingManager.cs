@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace VRCEventUtil.Models.Setting
 {
@@ -87,25 +89,45 @@ namespace VRCEventUtil.Models.Setting
 
             if (!File.Exists(Settings.SteamExePath))
             {
-                Settings.SteamExePath = SearchSteamExe();
+                Settings.SteamExePath = GetSteamExePath();
                 SaveSetting(SettingFilePath);
                 Logger.Log($"steam.exeのパスを{Settings.SteamExePath}に自動設定しました．");
             }
         }
 
         /// <summary>
-        /// steam.exeを検索してパスを取得します．
+        /// steam.exeのパスを取得します．
         /// </summary>
         /// <returns>パス．見つからなければnull</returns>
-        private static string? SearchSteamExe()
+        private static string? GetSteamExePath()
         {
             const string DEFAULT_PATH = @"C:\Program Files (x86)\Steam\steam.exe";
-            if (File.Exists(DEFAULT_PATH))
+            string? path = null;
+
+            try
             {
-                return DEFAULT_PATH;
+                using (var key = Registry.ClassesRoot.OpenSubKey("steam").OpenSubKey("Shell").OpenSubKey("Open").OpenSubKey("Command"))
+                {
+                    var command = key.GetValue(null) as string;
+                    if (command is object)
+                    {
+                        path = Regex.Matches(command, @"""[^""]*""").FirstOrDefault()?.Value.Trim('"');
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
             }
 
-            return null;
+            if (File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                return File.Exists(DEFAULT_PATH) ? DEFAULT_PATH : null;
+            }
         }
     }
 }
