@@ -167,8 +167,14 @@
   <data name="FileFilter_JSON" xml:space="preserve">
     <value>JSONファイル (*.json)|*.json</value>
   </data>
+  <data name="MenuTitle_About" xml:space="preserve">
+    <value>このソフトについて</value>
+  </data>
   <data name="MenuTitle_File" xml:space="preserve">
     <value>ファイル(_F)</value>
+  </data>
+  <data name="MenuTitle_Help" xml:space="preserve">
+    <value>ヘルプ(_H)</value>
   </data>
   <data name="MenuTitle_Setting" xml:space="preserve">
     <value>設定</value>

@@ -207,11 +207,29 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   このソフトについて に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTitle_About {
+            get {
+                return ResourceManager.GetString("MenuTitle_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ファイル(_F) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MenuTitle_File {
             get {
                 return ResourceManager.GetString("MenuTitle_File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ヘルプ(_H) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTitle_Help {
+            get {
+                return ResourceManager.GetString("MenuTitle_Help", resourceCulture);
             }
         }
         

@@ -15,7 +15,7 @@
     mc:Ignorable="av"
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    Title="VRChat Invite Util"
+    Title="VRChat Event Util"
     TitleCharacterCasing="Normal"
     Width="980" MinWidth="800"
     Height="650" MinHeight="650"
@@ -67,6 +67,15 @@
                           Command="{Binding OpenSettingWindowCommand}">
                     <MenuItem.Icon>
                         <Path Data="{StaticResource SettingIcon}" Style="{StaticResource IconPathDefaultStyle}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="{x:Static props:Resources.MenuTitle_Help}">
+                <MenuItem Header="{x:Static props:Resources.MenuTitle_About}"
+                          Command="{Binding OpenAboutWindowCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterialDesign Kind="InfoOutline" />
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>

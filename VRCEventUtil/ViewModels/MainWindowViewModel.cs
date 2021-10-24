@@ -21,6 +21,7 @@ using System.Diagnostics;
 using VRCEventUtil.Models.Api;
 using VRCEventUtil.Models.Setting;
 using System.Collections.Specialized;
+using VRCEventUtil.Views;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -581,6 +582,15 @@ namespace VRCEventUtil.ViewModels
         private ViewModelCommand? _openSettingWindowCommand;
         public ViewModelCommand OpenSettingWindowCommand => _openSettingWindowCommand ??= new ViewModelCommand(OpenSettingWindow);
 
+        /// <summary>
+        /// About画面を開きます．
+        /// </summary>
+        public void OpenAboutWindow()
+        {
+            Messenger.Raise(new TransitionMessage(typeof(AboutWindow), new AboutWindowViewModel(), TransitionMode.Modal, "WindowInteraction"));
+        }
+        public ViewModelCommand OpenAboutWindowCommand => _openAboutWindowCommand ??= new ViewModelCommand(OpenAboutWindow);
+        private ViewModelCommand? _openAboutWindowCommand;
         #endregion メニュー
         #endregion コマンド
 
