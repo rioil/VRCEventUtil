@@ -222,6 +222,9 @@
   <data name="Text_General" xml:space="preserve">
     <value>全般</value>
   </data>
+  <data name="Text_GroupList" xml:space="preserve">
+    <value>グループ一覧</value>
+  </data>
   <data name="Text_ID" xml:space="preserve">
     <value>ID</value>
   </data>

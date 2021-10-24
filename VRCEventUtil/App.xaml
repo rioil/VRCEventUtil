@@ -126,7 +126,7 @@
                                 <SolidColorBrush Color="#212121"/>
                             </Setter.Value>
                         </Setter>
-                        <Setter Property="Height" Value="12"/>
+                        <Setter Property="Height" Value="14"/>
                     </Style>
 
                     <!--3つ点が並んだSplitterのマーク-->

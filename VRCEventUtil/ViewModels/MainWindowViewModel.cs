@@ -20,6 +20,7 @@ using System.Collections;
 using System.Diagnostics;
 using VRCEventUtil.Models.Api;
 using VRCEventUtil.Models.Setting;
+using System.Collections.Specialized;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -109,7 +110,7 @@ namespace VRCEventUtil.ViewModels
             {
                 if (RaisePropertyChangedIfSet(ref _locationIdOrUrl, value))
                 {
-                    InviteCommand.RaiseCanExecuteChanged();
+                    InviteCommandRaiseCanExecuteChanged();
                 }
             }
         }
@@ -204,12 +205,65 @@ namespace VRCEventUtil.ViewModels
             {
                 if (RaisePropertyChangedIfSet(ref _users, value))
                 {
-                    InviteCommand.RaiseCanExecuteChanged();
-                    _users.CollectionChanged += (sender, args) => InviteCommand.RaiseCanExecuteChanged();
+                    InviteCommandRaiseCanExecuteChanged();
+                    UpdateGruop();
+
+                    _users.CollectionChanged += (sender, args) =>
+                    {
+                        switch (args.Action)
+                        {
+                            case NotifyCollectionChangedAction.Add:
+                                foreach (var user in args.NewItems.Cast<InviteUser>())
+                                {
+                                    var group = Groups.FirstOrDefault(g => g.GroupName == user.GroupName);
+                                    if (group is null)
+                                    {
+                                        group = new UserGroup(user.GroupName, user);
+                                        Groups.Add(group);
+                                    }
+                                    else
+                                    {
+                                        group.Users.Add(user);
+                                    }
+                                }
+                                break;
+                            case NotifyCollectionChangedAction.Remove:
+                                foreach (var user in args.OldItems.Cast<InviteUser>())
+                                {
+                                    var group = Groups.FirstOrDefault(g => g.GroupName == user.GroupName);
+                                    if (group is object)
+                                    {
+                                        group.Users.Remove(user);
+                                    }
+                                }
+                                break;
+                            case NotifyCollectionChangedAction.Reset:
+                                UpdateGruop();
+                                break;
+                            case NotifyCollectionChangedAction.Replace:
+                                var oldUser = args.OldItems.Cast<InviteUser>().FirstOrDefault();
+                                var newUser = args.NewItems.Cast<InviteUser>().FirstOrDefault();
+                                if (oldUser == newUser) { break; }
+                                Groups.FirstOrDefault(g => g.GroupName == oldUser.GroupName)?.Users.Remove(oldUser);
+                                Groups.FirstOrDefault(g => g.GroupName == newUser.GroupName)?.Users.Add(newUser);
+                                break;
+                        }
+                        InviteCommandRaiseCanExecuteChanged();
+                    };
                 }
             }
         }
         private ObservableCollection<InviteUser> _users = default!;
+
+        /// <summary>
+        /// グループリスト
+        /// </summary>
+        public ObservableCollection<UserGroup> Groups
+        {
+            get => _groups;
+            set => RaisePropertyChangedIfSet(ref _groups, value);
+        }
+        private ObservableCollection<UserGroup> _groups = new ObservableCollection<UserGroup>();
 
         /// <summary>
         /// インスタンスの公開範囲
@@ -241,7 +295,7 @@ namespace VRCEventUtil.ViewModels
             {
                 if (RaisePropertyChangedIfSet(ref _isInviting, value))
                 {
-                    InviteCommand.RaiseCanExecuteChanged();
+                    InviteCommandRaiseCanExecuteChanged();
                     AbortInviteCommand.RaiseCanExecuteChanged();
                 }
             }
@@ -312,8 +366,10 @@ namespace VRCEventUtil.ViewModels
         /// <summary>
         /// Invite送信処理を行います．
         /// </summary>
-        public async void Invite()
+        public async void Invite(IEnumerable<InviteUser>? users)
         {
+            if (users is null) { return; }
+
             _inviteCancellationTokenSrc = new CancellationTokenSource();
 
             InviteProgress = 0;
@@ -331,7 +387,7 @@ namespace VRCEventUtil.ViewModels
 
             try
             {
-                var result = await ApiManager.Instance.Invite(locationId, Users, progress, _inviteCancellationTokenSrc.Token);
+                var result = await ApiManager.Instance.Invite(locationId, users, progress, _inviteCancellationTokenSrc.Token);
                 if (result)
                 {
                     Log(Resources.Success_Invite);
@@ -349,9 +405,21 @@ namespace VRCEventUtil.ViewModels
             IsInviting = false;
         }
 
+        public void Invite(InviteUser user)
+        {
+            Invite(new InviteUser[] { user });
+        }
+
         public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(LocationIdOrUrl) && Users is object && Users.Any();
-        private ViewModelCommand? _inviteCommand;
-        public ViewModelCommand InviteCommand => _inviteCommand ??= new ViewModelCommand(Invite, CanInvite);
+
+        private ViewModelCommand? _inviteAllCommand;
+        public ViewModelCommand InviteAllCommand => _inviteAllCommand ??= new ViewModelCommand(() => Invite(Users), CanInvite);
+
+        private ListenerCommand<UserGroup>? _inviteGroupCommand;
+        public ListenerCommand<UserGroup> InviteGroupCommand => _inviteGroupCommand ??= new ListenerCommand<UserGroup>(group => Invite(group.Users), CanInvite);
+
+        private ListenerCommand<InviteUser>? _inviteUserCommand;
+        public ListenerCommand<InviteUser> InviteUserCommand => _inviteUserCommand ??= new ListenerCommand<InviteUser>(user => Invite(user), CanInvite);
 
         /// <summary>
         /// Invite中断処理を行います．
@@ -520,6 +588,25 @@ namespace VRCEventUtil.ViewModels
         #endregion メソッド
 
         #region 内部関数
+        /// <summary>
+        /// グループをすべて更新します．
+        /// </summary>
+        private void UpdateGruop()
+        {
+            var groupList = Users.GroupBy(user => user.GroupName).Select(grouping => new UserGroup(grouping.Key, grouping));
+            Groups = new ObservableCollection<UserGroup>(groupList);
+        }
+
+        /// <summary>
+        /// Invite関連コマンドの実行可能状態更新処理を行います．
+        /// </summary>
+        private void InviteCommandRaiseCanExecuteChanged()
+        {
+            InviteAllCommand.RaiseCanExecuteChanged();
+            InviteGroupCommand.RaiseCanExecuteChanged();
+            InviteUserCommand.RaiseCanExecuteChanged();
+        }
+
         private void Log(string msg)
         {
             Logs.Add(new UserLog(msg));

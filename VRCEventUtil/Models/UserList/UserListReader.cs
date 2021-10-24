@@ -22,6 +22,7 @@ namespace VRCEventUtil.Models.UserList
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true
             };
+            // TODO 例外処理
             var records = JsonSerializer.Deserialize<InviteUser[]>(File.ReadAllText(filePath), options).ToList();
             var distinctedRecords = records.Distinct(new InviteUserComparer()).ToList();
             if (records.Count != distinctedRecords.Count)

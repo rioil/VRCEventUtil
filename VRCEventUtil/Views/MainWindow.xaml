@@ -17,7 +17,7 @@
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     Title="VRChat Invite Util"
     TitleCharacterCasing="Normal"
-    Width="900" MinWidth="800"
+    Width="980" MinWidth="800"
     Height="650" MinHeight="650"
     WindowStartupLocation="CenterScreen">
 
@@ -78,6 +78,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="180"/>
             </Grid.RowDefinitions>
 
@@ -87,7 +88,7 @@
                 <ColumnDefinition Width="2*" MinWidth="250"/>
             </Grid.ColumnDefinitions>
 
-            <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="5" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
 
             <!--認証グリッド-->
             <GroupBox Grid.Row="0" Header="{x:Static props:Resources.Text_Authentication}">
@@ -224,8 +225,99 @@
                 </Grid>
             </GroupBox>
 
+            <!--グループ一覧-->
+            <GroupBox Grid.Row="2" Header="{x:Static props:Resources.Text_GroupList}">
+                <ItemsControl ItemsSource="{Binding Groups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type userlist:UserGroup}">
+                            <Grid>
+                                <GroupBox Header="{Binding GroupName}" mah:ControlsHelper.ContentCharacterCasing="Normal"
+                                      Margin="0 0 5 5" Width="180">
+                                    <ItemsControl ItemsSource="{Binding Users}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type userlist:InviteUser}">
+                                                <StackPanel Orientation="Horizontal" Margin="0 2">
+                                                    <!--ユーザーの状態を色で示す四角形-->
+                                                    <Rectangle VerticalAlignment="Stretch" Width="4" Margin="0 0 5 0">
+                                                        <Rectangle.Style>
+                                                            <Style TargetType="Rectangle">
+                                                                <Setter Property="Fill" Value="Gray"/>
+                                                                <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserOffline}"/>
+                                                                <Style.Triggers>
+                                                                    <!--オンラインでInvite先のインスタンスにいない場合はオレンジ色-->
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding IsInInstance}" Value="False"/>
+                                                                            <Condition Binding="{Binding IsOnline}" Value="True"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Fill" Value="{StaticResource OrangeColorBrush}"/>
+                                                                        <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserNotInInstance}"/>
+                                                                    </MultiDataTrigger>
+                                                                    <!--Invite先のインスタンスにいる場合は緑色-->
+                                                                    <DataTrigger Binding="{Binding IsInInstance}" Value="True">
+                                                                        <Setter Property="Fill" Value="{StaticResource GreenColorBrush}"/>
+                                                                        <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserInInstance}"/>
+                                                                    </DataTrigger>
+                                                                    <!--Invite送信済みの場合-->
+                                                                    <DataTrigger Binding="{Binding HasInvited}" Value="True">
+                                                                        <Setter Property="Fill" Value="{StaticResource LightBlueColorBrush}"/>
+                                                                        <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_InviteSent}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Rectangle.Style>
+                                                    </Rectangle>
+                                                    <Button ToolTip="{x:Static props:Resources.Text_SendInvite}"
+                                                        Command="{Binding DataContext.InviteUserCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}">
+                                                        <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                                                    </Button>
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="5 0 0 0">
+                                                        <TextBlock.ToolTip>
+                                                            <TextBlock>
+                                                            <Run Text="{Binding Name}"/>
+                                                            <LineBreak/>
+                                                            <Run Text="{Binding Id}"/>
+                                                            </TextBlock>
+                                                        </TextBlock.ToolTip>
+                                                </TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </GroupBox>
+
+                                <Button Grid.Row="4" ToolTip="{x:Static props:Resources.Text_SendInvite}"
+                                        Command="{Binding DataContext.InviteGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        VerticalAlignment="Top" HorizontalAlignment="Right"
+                                        Style="{StaticResource MahApps.Styles.Button.WindowCommands}" Margin="0 7 5 0">
+                                    <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}" Fill="White"/>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                    <!--グループパネルは折り返して表示-->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <!--必要に応じてスクロールバーを表示-->
+                    <ItemsControl.Template>
+                        <ControlTemplate TargetType="ItemsControl">
+                            <ScrollViewer>
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                </ItemsControl>
+            </GroupBox>
+
             <!--送信先設定-->
-            <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="4" Header="{x:Static props:Resources.Text_SendTargetSetting}"
+            <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="5" Header="{x:Static props:Resources.Text_SendTargetSetting}"
                       IsEnabled="{Binding IsLoggedIn}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -267,51 +359,21 @@
                         </DataGrid.Resources>
 
                         <DataGrid.Columns>
-                            <!--名前-->
-                            <DataGridTextColumn Header="{x:Static props:Resources.Text_Username}" Binding="{Binding Name}" MinWidth="60"/>
+                            <!--グループ名-->
+                            <DataGridTextColumn Binding="{Binding GroupName}" MinWidth="50">
+                                <DataGridTextColumn.Header>
+                                    <iconPacks:PackIconMaterialDesign Kind="Group" />
+                                </DataGridTextColumn.Header>
 
-                            <!--スタッフか-->
-                            <DataGridTemplateColumn SortMemberPath="IsStaff" MinWidth="40">
-                                <!--Header-->
-                                <DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MahApps.Styles.DataGridColumnHeader}">
                                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                                     </Style>
-                                </DataGridTemplateColumn.HeaderStyle>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
 
-                                <!--内容-->
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border Background="Transparent">
-
-                                            <Border.Style>
-                                                <Style TargetType="{x:Type Border}">
-                                                    <Setter Property="ToolTip" Value="{x:Null}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsStaff}" Value="True">
-                                                            <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserIsStaff}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                            <Path Data="{StaticResource FlagIcon}" Fill="{StaticResource DefaultIconColorBrush}"
-                                                  VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="16" Margin="4">
-                                                <Path.Style>
-                                                    <Style TargetType="{x:Type Path}">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsStaff}" Value="True">
-                                                                <Setter Property="Visibility" Value="Visible"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Path.Style>
-                                            </Path>
-
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                            <!--名前-->
+                            <DataGridTextColumn Header="{x:Static props:Resources.Text_Username}" Binding="{Binding Name}" MinWidth="60"/>
 
                             <!--ID-->
                             <!--<DataGridTextColumn Header="{x:Static props:Resources.Text_ID}" Binding="{Binding Id}" Width="245" CanUserResize="False"/>-->
@@ -367,7 +429,7 @@
                             </DataGridTemplateColumn>
 
                             <!--ワールドにいるか-->
-                            <DataGridTemplateColumn SortMemberPath="IsInWorld" MinWidth="40">
+                            <DataGridTemplateColumn SortMemberPath="IsInInstance" MinWidth="40">
                                 <!--Header-->
                                 <DataGridTemplateColumn.Header>
                                     <Border Background="Transparent">
@@ -393,13 +455,13 @@
                                                     <Style.Triggers>
                                                         <MultiDataTrigger>
                                                             <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsInWorld}" Value="False"/>
+                                                                <Condition Binding="{Binding IsInInstance}" Value="False"/>
                                                                 <Condition Binding="{Binding IsOnline}" Value="True"/>
                                                             </MultiDataTrigger.Conditions>
                                                             <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserNotInInstance}"/>
                                                         </MultiDataTrigger>
 
-                                                        <DataTrigger Binding="{Binding IsInWorld}" Value="True">
+                                                        <DataTrigger Binding="{Binding IsInInstance}" Value="True">
                                                             <Setter Property="ToolTip" Value="{x:Static props:Resources.Text_UserInInstance}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -413,14 +475,14 @@
                                                         <Style.Triggers>
                                                             <MultiDataTrigger>
                                                                 <MultiDataTrigger.Conditions>
-                                                                    <Condition Binding="{Binding IsInWorld}" Value="False"/>
+                                                                    <Condition Binding="{Binding IsInInstance}" Value="False"/>
                                                                     <Condition Binding="{Binding IsOnline}" Value="True"/>
                                                                 </MultiDataTrigger.Conditions>
                                                                 <Setter Property="Data" Value="{StaticResource LocationIcon}"/>
                                                                 <Setter Property="Fill" Value="{StaticResource OrangeColorBrush}"/>
                                                             </MultiDataTrigger>
 
-                                                            <DataTrigger Binding="{Binding IsInWorld}" Value="True">
+                                                            <DataTrigger Binding="{Binding IsInInstance}" Value="True">
                                                                 <Setter Property="Data" Value="{StaticResource LocationIcon}"/>
                                                                 <Setter Property="Fill" Value="{StaticResource GreenColorBrush}"/>
                                                             </DataTrigger>
@@ -438,7 +500,7 @@
                     </DataGrid>
 
                     <!--Invite実行ボタン-->
-                    <Button Grid.Row="3" Command="{Binding InviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
+                    <Button Grid.Row="3" Command="{Binding InviteAllCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                             <TextBlock Text="{x:Static props:Resources.Text_SendInvite}" VerticalAlignment="Center" Margin="5 0 0 0"/>
@@ -466,8 +528,10 @@
                 </Grid>
             </GroupBox>
 
+            <GridSplitter Grid.Row="3" Height="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
             <!--ログ-->
-            <GroupBox Grid.Row="3" Header="{x:Static props:Resources.Text_Log}">
+            <GroupBox Grid.Row="4" Header="{x:Static props:Resources.Text_Log}">
                 <ListBox ItemsSource="{Binding Logs}" VirtualizingPanel.ScrollUnit="Pixel" av:ItemsSource="{av:SampleData ItemCount=5}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -479,7 +543,7 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </GroupBox>
-            <Button Grid.Row="3" ToolTip="{x:Static props:Resources.Text_ClearLog}"
+            <Button Grid.Row="4" ToolTip="{x:Static props:Resources.Text_ClearLog}"
                     Command="{Binding ClaerLogCommand}"
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Style="{StaticResource MahApps.Styles.Button.WindowCommands}" Margin="0 5 0 0">
@@ -487,13 +551,10 @@
             </Button>
         </Grid>
 
-        <!--<GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
-        <Path Grid.Row="3" Data="{StaticResource SplitterMark}" Fill="Gray" VerticalAlignment="Top" HorizontalAlignment="Center"/>-->
-
         <!--ステータスバー-->
-        <StatusBar Grid.Row="2">
-            <ProgressBar Width="100" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}"/>
-            <ProgressBar Width="100" Height="10" Value="{Binding InviteProgress}" Visibility="{Binding IsInviting, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}">
+        <StatusBar Grid.Row="2" Padding="2 0 0 0">
+            <ProgressBar Width="150" Height="10" IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}"/>
+            <ProgressBar Width="150" Height="10" Value="{Binding InviteProgress}" Visibility="{Binding IsInviting, Converter={conv:BoolToVisibilityConverter FalseVisibility=Collapsed}}">
                 <ProgressBar.ToolTip>
                     <TextBlock Text="{Binding InviteProgress, StringFormat={x:Static props:Resources.Text_SendingInvite}}"/>
                 </ProgressBar.ToolTip>

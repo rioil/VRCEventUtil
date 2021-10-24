@@ -364,6 +364,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   グループ一覧 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Text_GroupList {
+            get {
+                return ResourceManager.GetString("Text_GroupList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ID に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Text_ID {

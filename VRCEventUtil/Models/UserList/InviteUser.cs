@@ -13,14 +13,16 @@ namespace VRCEventUtil.Models.UserList
     public class InviteUser : NotificationObject
     {
         /// <summary>
-        /// 名前とIDを指定してユーザーを作成します．
+        /// 名前とID，グループ名を指定してユーザーを作成します．
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
-        public InviteUser(string id, string? name)
+        /// <param name="groupName"></param>
+        public InviteUser(string id, string? name, string groupName)
         {
             Id = id;
             Name = name;
+            GroupName = groupName;
         }
 
         /// <summary>
@@ -49,14 +51,15 @@ namespace VRCEventUtil.Models.UserList
         private string? _name;
 
         /// <summary>
-        /// スタッフか
+        /// グループ名
         /// </summary>
-        public bool IsStaff
+        [JsonPropertyName("group")]
+        public string GroupName
         {
-            get => _IsStaff;
-            set => RaisePropertyChangedIfSet(ref _IsStaff, value);
+            get => _groupName;
+            set => RaisePropertyChangedIfSet(ref _groupName, value);
         }
-        private bool _IsStaff;
+        private string _groupName = UserGroup.DEFAULT_GROUP_NAME;
 
         /// <summary>
         /// オンラインか
@@ -81,15 +84,15 @@ namespace VRCEventUtil.Models.UserList
         private bool _hasInvited;
 
         /// <summary>
-        /// ユーザーがワールドにいるか
+        /// ユーザーがインスタンスにいるか
         /// </summary>
         [JsonIgnore]
-        public bool IsInWorld
+        public bool IsInInstance
         {
-            get => _isInWorld;
-            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isInWorld, value));
+            get => _isInInstance;
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isInInstance, value));
         }
-        private bool _isInWorld;
+        private bool _isInInstance;
     }
 
     /// <summary>

@@ -162,7 +162,7 @@ namespace VRCEventUtil.Models.Api
                         if (cancellationToken.IsCancellationRequested) { return false; }
 
                         // 状態をリセット
-                        user.IsInWorld = false;
+                        user.IsInInstance = false;
                         user.HasInvited = false;
 
                         // ユーザーのいるインスタンスを確認
@@ -180,7 +180,7 @@ namespace VRCEventUtil.Models.Api
                         user.IsOnline = true;
                         if (loc == locationId)
                         {
-                            user.IsInWorld = true;
+                            user.IsInInstance = true;
                             continue;
                         }
 
