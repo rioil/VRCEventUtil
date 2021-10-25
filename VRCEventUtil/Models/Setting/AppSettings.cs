@@ -47,7 +47,7 @@ namespace VRCEventUtil.Models.Setting
                 }
             }
         }
-        private int _apiCallIntervalSec = 2;
+        private int _apiCallIntervalSec = 1;
 
         /// <summary>
         /// SteamのEXEファイルのパス
