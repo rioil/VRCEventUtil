@@ -18,7 +18,17 @@
     TitleCharacterCasing="Normal"
     Width="980" MinWidth="800"
     Height="650" MinHeight="650"
-    WindowStartupLocation="CenterScreen">
+    WindowStartupLocation="CenterScreen"
+    Icon="/VRCEventUtil;component/Resources/app_icon.png">
+
+    <mah:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <!-- Setting a Margin and enable hight-quality image -->
+            <Image Margin="5"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Source="{Binding}" />
+        </DataTemplate>
+    </mah:MetroWindow.IconTemplate>
 
     <mah:MetroWindow.DataContext>
         <vm:MainWindowViewModel />
