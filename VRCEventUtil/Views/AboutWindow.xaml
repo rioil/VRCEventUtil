@@ -84,7 +84,10 @@
                 </StackPanel.Resources>
 
                 <TextBlock>
-                    <Bold>MahApps.Metro</Bold> - MIT License
+                    <Bold>MahApps.Metro</Bold> - 
+                    <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro/blob/develop/LICENSE"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource TextHyperlinkStyle}">MIT License</Hyperlink>
                     <LineBreak/>
                     <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro"
                                RequestNavigate="Hyperlink_RequestNavigate">
@@ -92,7 +95,10 @@
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock>
-                    <Bold>MahApps.Metro.IconPacks</Bold> - MIT License
+                    <Bold>MahApps.Metro.IconPacks</Bold> - 
+                    <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro.IconPacks/blob/develop/LICENSE"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource TextHyperlinkStyle}">MIT License</Hyperlink>
                     <LineBreak/>
                     <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro.IconPacks"
                                RequestNavigate="Hyperlink_RequestNavigate">
@@ -100,7 +106,10 @@
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock>
-                    <Bold>Material design icons (Google)</Bold> - Apache License Version 2.0
+                    <Bold>Material design icons (Google)</Bold> - 
+                    <Hyperlink NavigateUri="http://www.apache.org/licenses/LICENSE-2.0.txt"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource TextHyperlinkStyle}">Apache License Version 2.0</Hyperlink>
                     <LineBreak/>
                     <Hyperlink NavigateUri="http://google.github.io/material-design-icons/"
                                RequestNavigate="Hyperlink_RequestNavigate">
@@ -108,7 +117,10 @@
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock>
-                    <Bold>Fluent UI System Icons (Microsoft)</Bold> - MIT License
+                    <Bold>Fluent UI System Icons (Microsoft)</Bold> - 
+                    <Hyperlink NavigateUri="https://github.com/microsoft/fluentui-system-icons/blob/master/LICENSE"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource TextHyperlinkStyle}">MIT License</Hyperlink>
                     <LineBreak/>
                     <Hyperlink NavigateUri="https://github.com/microsoft/fluentui-system-icons"
                                RequestNavigate="Hyperlink_RequestNavigate">

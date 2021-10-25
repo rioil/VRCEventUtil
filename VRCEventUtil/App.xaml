@@ -129,6 +129,11 @@
                         <Setter Property="Height" Value="14"/>
                     </Style>
 
+                    <!--下線のないハイパーリンクスタイル-->
+                    <Style x:Key="TextHyperlinkStyle" TargetType="Hyperlink" BasedOn="{StaticResource MahApps.Styles.Hyperlink}">
+                        <Setter Property="TextDecorations" Value=""/>
+                    </Style>
+
                     <!--3つ点が並んだSplitterのマーク-->
                     <GeometryGroup x:Key="SplitterMark">
                         <GeometryGroup.Children>
