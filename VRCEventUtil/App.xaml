@@ -95,6 +95,29 @@
                             M3,3.74755436 C3,3.3333408 3.33578644,2.99755436 3.75,2.99755436 L20.2541046,2.99755436 C20.8721756,2.99755436 21.224952,3.70320163 20.8540564,4.1976187 L16.6897574,9.74877718 L20.8540564,15.2999357 C21.224952,15.7943527 20.8721756,16.5 20.2541046,16.5 L4.5,16.4995544 L4.5,21.2493867 C4.5,21.6290824 4.21784612,21.9428776 3.85177056,21.9925401 L3.75,21.9993867 C3.37030423,21.9993867 3.05650904,21.7172328 3.00684662,21.3511572 L3,21.2493867 L3,3.74755436 Z M18.7539036,4.49755436 L4.5,4.49755436 L4.5,15 L18.7539036,15 L15.1522303,10.1988415 C14.9521659,9.93214864 14.9521659,9.56540572 15.1522303,9.29871285 L18.7539036,4.49755436 Z
                         </PathGeometry.Figures>
                     </PathGeometry>
+                    
+                    <!--Material design icons (Google)-->
+                    <PathGeometry x:Key="InfoOutlineIcon" FillRule="Nonzero">
+                        <PathGeometry.Figures>
+                            M235 320v43h42v-43h-42zM256 85c94 0 171 77 171 171s-77 171 -171 171s-171 -77 -171 -171s77 -171 171 -171zM256 469c118 0 213 -95 213 -213s-95 -213 -213 -213s-213 95 -213 213s95 213 213 213zM235 149v128h42v-128h-42z
+                        </PathGeometry.Figures>
+                    </PathGeometry>
+                    
+                    <PathGeometry x:Key="GroupIcon" FillRule="Nonzero">
+                        <PathGeometry.Figures>
+                            M341 235c50 0 150 -25 150 -75v-53h-128v53c0 32 -17 56 -42 74c7 1 14 1 20 1zM171 235c50 0 149 -25 149 -75v-53h-299v53c0 50 100 75 150 75zM171 277c-35 0 -64 29 -64 64s29 64 64 64s63 -29 63 -64s-28 -64 -63 -64zM341 277c-35 0 -64 29 -64 64s29 64 64 64 s64 -29 64 -64s-29 -64 -64 -64z
+                        </PathGeometry.Figures>
+
+                        <PathGeometry.Transform>
+                            <RotateTransform Angle="180"/>
+                        </PathGeometry.Transform>
+                    </PathGeometry>
+
+                    <PathGeometry x:Key="ClearAllIcon" FillRule="Nonzero">
+                        <PathGeometry.Figures>
+                            M149 363h299v-43h-299v43zM64 149v43h299v-43h-299zM107 235v42h298v-42h-298z
+                        </PathGeometry.Figures>
+                    </PathGeometry>
 
                     <!--ブラシ色定義-->
                     <SolidColorBrush x:Key="LightBlueColorBrush" Color="#1FD1ED"/>
@@ -114,6 +137,7 @@
                                 <SolidColorBrush Color="#212121"/>
                             </Setter.Value>
                         </Setter>
+                        <Setter Property="Height" Value="14"/>
                     </Style>
 
                     <!--ボタンアイコンPath標準スタイル-->

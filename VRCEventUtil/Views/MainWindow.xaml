@@ -14,7 +14,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="av"
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     Title="VRChat Event Util"
     TitleCharacterCasing="Normal"
     Width="980" MinWidth="800"
@@ -75,7 +74,7 @@
                 <MenuItem Header="{x:Static props:Resources.MenuTitle_About}"
                           Command="{Binding OpenAboutWindowCommand}">
                     <MenuItem.Icon>
-                        <iconPacks:PackIconMaterialDesign Kind="InfoOutline" />
+                        <Path Data="{StaticResource InfoOutlineIcon}" Style="{StaticResource IconPathDefaultStyle}"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -371,7 +370,8 @@
                             <!--グループ名-->
                             <DataGridTextColumn Binding="{Binding GroupName}" MinWidth="50">
                                 <DataGridTextColumn.Header>
-                                    <iconPacks:PackIconMaterialDesign Kind="Group" />
+                                    <Path Data="{StaticResource GroupIcon}" Fill="{StaticResource GrayColorBrush}"
+                                          VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Height="12"/>
                                 </DataGridTextColumn.Header>
 
                                 <DataGridTextColumn.HeaderStyle>
@@ -556,7 +556,7 @@
                     Command="{Binding ClaerLogCommand}"
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Style="{StaticResource MahApps.Styles.Button.WindowCommands}" Margin="0 5 0 0">
-                <iconPacks:PackIconMaterialDesign Kind="ClearAll" />
+                <Path Data="{StaticResource ClearAllIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
             </Button>
         </Grid>
 

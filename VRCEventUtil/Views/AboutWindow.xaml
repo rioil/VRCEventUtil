@@ -95,17 +95,6 @@
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock>
-                    <Bold>MahApps.Metro.IconPacks</Bold> - 
-                    <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro.IconPacks/blob/develop/LICENSE"
-                               RequestNavigate="Hyperlink_RequestNavigate"
-                               Style="{StaticResource TextHyperlinkStyle}">MIT License</Hyperlink>
-                    <LineBreak/>
-                    <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro.IconPacks"
-                               RequestNavigate="Hyperlink_RequestNavigate">
-                        https://github.com/MahApps/MahApps.Metro.IconPacks
-                    </Hyperlink>
-                </TextBlock>
-                <TextBlock>
                     <Bold>Material design icons (Google)</Bold> - 
                     <Hyperlink NavigateUri="http://www.apache.org/licenses/LICENSE-2.0.txt"
                                RequestNavigate="Hyperlink_RequestNavigate"
