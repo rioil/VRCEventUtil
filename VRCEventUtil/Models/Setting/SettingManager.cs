@@ -106,13 +106,10 @@ namespace VRCEventUtil.Models.Setting
 
             try
             {
-                using (var key = Registry.ClassesRoot.OpenSubKey("steam").OpenSubKey("Shell").OpenSubKey("Open").OpenSubKey("Command"))
+                var command = Registry.GetValue(@"HKEY_CLASSES_ROOT\steam\Shell\Open\Command", null, null) as string;
+                if (command is object)
                 {
-                    var command = key.GetValue(null) as string;
-                    if (command is object)
-                    {
-                        path = Regex.Matches(command, @"""[^""]*""").FirstOrDefault()?.Value.Trim('"');
-                    }
+                    path = Regex.Matches(command, @"(?<="")[^""]*(?="")").FirstOrDefault()?.Value;
                 }
             }
             catch (Exception ex)
