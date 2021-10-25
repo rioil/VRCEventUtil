@@ -552,7 +552,7 @@
                     Command="{Binding ClaerLogCommand}"
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Style="{StaticResource MahApps.Styles.Button.WindowCommands}" Margin="0 6 0 0">
-                <Path Data="{StaticResource ClearAllIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                <Path Data="{StaticResource BroomIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
             </Button>
         </Grid>
 

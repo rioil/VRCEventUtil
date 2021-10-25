@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:VRCEventUtil.ViewModels"
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     Title="About" mah:TitleCharacterCasing="Normal"
-    Height="650" Width="525" ResizeMode="NoResize"
+    Height="600" Width="525" ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
     WindowTransitionsEnabled="False">
 
@@ -92,17 +92,6 @@
                     <Hyperlink NavigateUri="https://github.com/MahApps/MahApps.Metro"
                                RequestNavigate="Hyperlink_RequestNavigate">
                         https://github.com/MahApps/MahApps.Metro
-                    </Hyperlink>
-                </TextBlock>
-                <TextBlock>
-                    <Bold>Material design icons (Google)</Bold> - 
-                    <Hyperlink NavigateUri="http://www.apache.org/licenses/LICENSE-2.0.txt"
-                               RequestNavigate="Hyperlink_RequestNavigate"
-                               Style="{StaticResource TextHyperlinkStyle}">Apache License Version 2.0</Hyperlink>
-                    <LineBreak/>
-                    <Hyperlink NavigateUri="http://google.github.io/material-design-icons/"
-                               RequestNavigate="Hyperlink_RequestNavigate">
-                        http://google.github.io/material-design-icons/
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock>
