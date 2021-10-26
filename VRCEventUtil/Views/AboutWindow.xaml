@@ -40,7 +40,9 @@
 
         <StackPanel Grid.Row="0" Margin="5">
             <TextBlock Text="{Binding AppName}"/>
-            <TextBlock Text="{Binding Version, StringFormat=Version {0}}"/>
+            <TextBlock>
+                Version <Run Text="{Binding FileVersion}"/>
+            </TextBlock>
         </StackPanel>
 
         <GroupBox Grid.Row="1" Header="Software License" mah:ControlsHelper.ContentCharacterCasing="Normal">

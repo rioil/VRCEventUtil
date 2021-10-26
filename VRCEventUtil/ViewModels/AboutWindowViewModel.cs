@@ -1,6 +1,7 @@
 ﻿using Livet;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
@@ -14,7 +15,9 @@ namespace VRCEventUtil.ViewModels
         {
             var assembly = Assembly.GetExecutingAssembly();
             AppName = assembly.GetName().Name ?? MISSING_INFO;
-            Version = assembly.GetName().Version?.ToString() ?? MISSING_INFO;
+            //AssemblyVersion = assembly.GetName().Version?.ToString() ?? MISSING_INFO;
+            var info = FileVersionInfo.GetVersionInfo(assembly.Location);
+            FileVersion = info.FileVersion;
         }
 
         /// <summary>
@@ -28,13 +31,23 @@ namespace VRCEventUtil.ViewModels
         private string _appName = default!;
 
         /// <summary>
-        /// バージョン
+        /// アセンブリバージョン
         /// </summary>
-        public string Version
+        //public string AssemblyVersion
+        //{
+        //    get => _assemblyVersion;
+        //    set => RaisePropertyChangedIfSet(ref _assemblyVersion, value);
+        //}
+        //private string _assemblyVersion = default!;
+
+        /// <summary>
+        /// ファイルバージョン
+        /// </summary>
+        public string FileVersion
         {
-            get => _version;
-            set => RaisePropertyChangedIfSet(ref _version, value);
+            get => _fileVersion;
+            set => RaisePropertyChangedIfSet(ref _fileVersion, value);
         }
-        private string _version = default!;
+        private string _fileVersion = default!;
     }
 }
