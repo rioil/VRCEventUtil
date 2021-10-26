@@ -348,6 +348,9 @@ namespace VRCEventUtil.ViewModels
                 Messenger.Raise(new InformationMessage(Resources.Fail_LogIn,
                     Resources.Title_Error, MessageBoxImage.Warning, "InformationMessage"));
             }
+
+            Password = string.Empty;
+            MFACode = string.Empty;
         }
         private ViewModelCommand? _loginCommand;
         public ViewModelCommand LoginCommand => _loginCommand ??= new ViewModelCommand(Login);

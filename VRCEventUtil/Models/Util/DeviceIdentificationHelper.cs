@@ -42,10 +42,10 @@ namespace VRCEventUtil.Models.Util
         /// MACアドレスを取得します．
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<string> GetMacAddress()
+        public static IEnumerable<PhysicalAddress> GetMacAddress()
         {
             var interfaces = NetworkInterface.GetAllNetworkInterfaces();
-            var lst = interfaces.Select(nif => nif.GetPhysicalAddress().ToString());
+            var lst = interfaces.Select(nif => nif.GetPhysicalAddress());
             return lst;
         }
     }

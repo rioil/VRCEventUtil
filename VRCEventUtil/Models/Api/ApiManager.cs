@@ -101,7 +101,7 @@ namespace VRCEventUtil.Models.Api
 
             if (password is null) { return false; }
 
-            ClearAuthSettings();
+            AuthCookieManager.ClearCookies();
             Configuration.Default.Password = password;
             _authApi.Configuration.Username = username;
             _authApi.Configuration.Password = password;
@@ -133,7 +133,7 @@ namespace VRCEventUtil.Models.Api
         public void Logout()
         {
             _authApi?.Logout();
-            ClearAuthSettings();
+            AuthCookieManager.ClearCookies();
             Configuration.Default.Password = string.Empty;
         }
 
@@ -353,8 +353,8 @@ namespace VRCEventUtil.Models.Api
         {
             _authApi = new AuthenticationApi();
 
-            var authCookieVal = Settings.Default.AuthCookie;
-            var mfaCookieVal = Settings.Default.MFACookie;
+            var authCookieVal = AuthCookieManager.AuthCookie;
+            var mfaCookieVal = AuthCookieManager.MFACookie;
             if (string.IsNullOrWhiteSpace(authCookieVal))
             {
                 return false;
@@ -391,9 +391,8 @@ namespace VRCEventUtil.Models.Api
             var authCookie = cookies["auth"];
             var mfaCookie = cookies["twoFactorAuth"];
 
-            Settings.Default.AuthCookie = authCookie.Value;
-            Settings.Default.MFACookie = mfaCookie.Value;
-            Settings.Default.Save();
+            AuthCookieManager.AuthCookie = authCookie.Value;
+            AuthCookieManager.MFACookie = mfaCookie.Value;
         }
 
         /// <summary>
@@ -465,16 +464,6 @@ namespace VRCEventUtil.Models.Api
             {
                 throw new OperationCanceledException("Inviteの送信をキャンセルしました.", ex, cancellationToken);    // キャンセルによる例外はOperationCanceledExceptionにまとめる
             }
-        }
-
-        /// <summary>
-        /// 設定ファイルに保存された認証情報をクリアします．
-        /// </summary>
-        private void ClearAuthSettings()
-        {
-            Settings.Default.AuthCookie = null;
-            Settings.Default.MFACookie = null;
-            Settings.Default.Save();
         }
         #endregion 内部関数
     }
