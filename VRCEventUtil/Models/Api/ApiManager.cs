@@ -226,14 +226,13 @@ namespace VRCEventUtil.Models.Api
             if (userInfo is null) { return false; }
             user.Name = userInfo.DisplayName;
 
-            var loc = userInfo.Location;
-            if (loc == "offline")
+            user.IsOnline = userInfo.State == UserState.Online;
+            if (!user.IsOnline)
             {
-                user.IsOnline = false;
                 return true;
             }
 
-            user.IsOnline = true;
+            var loc = userInfo.Location;
             user.IsInInstance = loc == locationId;
 
             return true;
