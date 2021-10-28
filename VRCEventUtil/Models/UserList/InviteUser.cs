@@ -68,7 +68,7 @@ namespace VRCEventUtil.Models.UserList
         public bool IsOnline
         {
             get => _isOnline;
-            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isOnline, value));
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isOnline, value, nameof(CanInvite)));
         }
         private bool _isOnline;
 
@@ -90,9 +90,18 @@ namespace VRCEventUtil.Models.UserList
         public bool IsInInstance
         {
             get => _isInInstance;
-            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isInInstance, value));
+            set => DispatcherHelper.UIDispatcher.Invoke(() => RaisePropertyChangedIfSet(ref _isInInstance, value, nameof(CanInvite)));
         }
         private bool _isInInstance;
+
+        /// <summary>
+        /// Inviteが可能か
+        /// </summary>
+        [JsonIgnore]
+        public bool CanInvite
+        {
+            get => IsOnline && !IsInInstance;
+        }
     }
 
     /// <summary>

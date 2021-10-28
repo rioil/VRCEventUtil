@@ -146,7 +146,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<bool> Invite(string locationId, IEnumerable<InviteUser> users, IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<bool> Invite(string locationId, IEnumerable<InviteUser> users, IProgress<double> progress, CancellationToken cancellationToken = default)
         {
             return await Task.Run(async () =>
             {
@@ -166,21 +166,8 @@ namespace VRCEventUtil.Models.Api
                         user.HasInvited = false;
 
                         // ユーザーのいるインスタンスを確認
-                        var userInfo = await GetUserInfo(user.Id, cancellationToken);
-                        if (userInfo is null) { continue; }
-                        user.Name = userInfo.DisplayName;
-
-                        var loc = userInfo.Location;
-                        if (loc == "offline")
+                        if (!await UpdateUserStatus(user, locationId, cancellationToken) || !user.CanInvite)
                         {
-                            user.IsOnline = false;
-                            continue;
-                        }
-
-                        user.IsOnline = true;
-                        if (loc == locationId)
-                        {
-                            user.IsInInstance = true;
                             continue;
                         }
 
@@ -210,7 +197,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="userId"></param>
         /// <returns></returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<User?> GetUserInfo(string userId, CancellationToken cancellationToken)
+        public async Task<User?> GetUserInfo(string userId, CancellationToken cancellationToken = default)
         {
             var apiInstance = new UsersApi(_authApi.Configuration);
 
@@ -224,6 +211,32 @@ namespace VRCEventUtil.Models.Api
                 Logger.Log(ex);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// ユーザーの状態を更新します．
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="locationId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateUserStatus(InviteUser user, string? locationId, CancellationToken cancellationToken = default)
+        {
+            var userInfo = await GetUserInfo(user.Id, cancellationToken);
+            if (userInfo is null) { return false; }
+            user.Name = userInfo.DisplayName;
+
+            var loc = userInfo.Location;
+            if (loc == "offline")
+            {
+                user.IsOnline = false;
+                return true;
+            }
+
+            user.IsOnline = true;
+            user.IsInInstance = loc == locationId;
+
+            return true;
         }
 
         /// <summary>

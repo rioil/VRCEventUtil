@@ -288,6 +288,9 @@
   <data name="Text_SteamExePath" xml:space="preserve">
     <value>steam.exeのパス</value>
   </data>
+  <data name="Text_Update" xml:space="preserve">
+    <value>情報を更新</value>
+  </data>
   <data name="Text_UserInInstance" xml:space="preserve">
     <value>このユーザーはInvite先のインスタンスにいます．</value>
   </data>

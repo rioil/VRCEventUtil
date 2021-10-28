@@ -562,6 +562,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   情報を更新 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Text_Update {
+            get {
+                return ResourceManager.GetString("Text_Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   このユーザーはInvite先のインスタンスにいます． に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Text_UserInInstance {

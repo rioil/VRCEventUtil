@@ -207,6 +207,7 @@ namespace VRCEventUtil.ViewModels
                 if (RaisePropertyChangedIfSet(ref _users, value))
                 {
                     InviteCommandRaiseCanExecuteChanged();
+                    UpdateCommandRaiseCanExecuteChanged();
                     UpdateGruop();
 
                     _users.CollectionChanged += (sender, args) =>
@@ -249,7 +250,9 @@ namespace VRCEventUtil.ViewModels
                                 Groups.FirstOrDefault(g => g.GroupName == newUser.GroupName)?.Users.Add(newUser);
                                 break;
                         }
+
                         InviteCommandRaiseCanExecuteChanged();
+                        UpdateCommandRaiseCanExecuteChanged();
                     };
                 }
             }
@@ -436,8 +439,47 @@ namespace VRCEventUtil.ViewModels
         }
         private bool CanAbortInvite() => IsInviting && !IsInviteAborting;
         private ViewModelCommand? _abortInviteCommand;
-
         public ViewModelCommand AbortInviteCommand => _abortInviteCommand ??= new ViewModelCommand(AbortInvite, CanAbortInvite);
+
+        #region 情報更新コマンド
+        public async void Update(InviteUser user)
+        {
+            ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId);
+
+            await ApiManager.Instance.UpdateUserStatus(user, locationId);
+        }
+
+        public async void Update(UserGroup group)
+        {
+            ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId);
+
+            foreach (var user in group.Users)
+            {
+                await ApiManager.Instance.UpdateUserStatus(user, locationId);
+            }
+        }
+
+        public async void Update()
+        {
+            ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId);
+
+            foreach (var user in Users)
+            {
+                await ApiManager.Instance.UpdateUserStatus(user, locationId);
+            }
+        }
+
+        public bool CanUpdate() => Users is object && Users.Any();  // TODO
+
+        private ViewModelCommand? _updateAllCommand;
+        public ViewModelCommand UpdateAllCommand => _updateAllCommand ??= new ViewModelCommand(Update, CanUpdate);
+
+        private ListenerCommand<UserGroup>? _updateGroupCommand;
+        public ListenerCommand<UserGroup> UpdateGroupCommand => _updateGroupCommand ??= new ListenerCommand<UserGroup>(Update, CanUpdate);
+
+        private ListenerCommand<InviteUser>? _updateUserCommand;
+        public ListenerCommand<InviteUser> UpdateUserCommand => _updateUserCommand ??= new ListenerCommand<InviteUser>(Update, CanUpdate);
+        #endregion 情報更新コマンド
 
         /// <summary>
         /// ワールドインスタンス作成処理を行います．
@@ -511,8 +553,6 @@ namespace VRCEventUtil.ViewModels
         }
         private ViewModelCommand? _claerLogCommand;
         public ViewModelCommand ClaerLogCommand => _claerLogCommand ??= new ViewModelCommand(ClaerLog);
-
-
 
         public void OpenInVRChat()
         {
@@ -618,6 +658,16 @@ namespace VRCEventUtil.ViewModels
             InviteAllCommand.RaiseCanExecuteChanged();
             InviteGroupCommand.RaiseCanExecuteChanged();
             InviteUserCommand.RaiseCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Update関連コマンドの実行可能状態更新処理を行います．
+        /// </summary>
+        private void UpdateCommandRaiseCanExecuteChanged()
+        {
+            UpdateAllCommand.RaiseCanExecuteChanged();
+            UpdateGroupCommand.RaiseCanExecuteChanged();
+            UpdateUserCommand.RaiseCanExecuteChanged();
         }
 
         private void Log(string msg)

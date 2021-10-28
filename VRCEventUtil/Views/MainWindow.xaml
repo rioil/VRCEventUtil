@@ -276,6 +276,11 @@
                                                         CommandParameter="{Binding}">
                                                         <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                                                     </Button>
+                                                    <Button ToolTip="{x:Static props:Resources.Text_Update}"
+                                                        Command="{Binding DataContext.UpdateUserCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}">
+                                                        <Path Data="{StaticResource ArrowClockwiseIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                                                    </Button>
                                                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="5 0 0 0">
                                                         <TextBlock.ToolTip>
                                                             <TextBlock>
@@ -291,13 +296,27 @@
                                     </ItemsControl>
                                 </GroupBox>
 
-                                <Button Grid.Row="4" ToolTip="{x:Static props:Resources.Text_SendInvite}"
+                                <StackPanel Grid.Row="4" Orientation="Horizontal"
+                                            VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 1 5 0">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.WindowCommands}">
+                                            <Setter Property="Padding" Value="5"/>
+                                        </Style>
+
+                                        <Style TargetType="Path" BasedOn="{StaticResource ButtonIconPathStyle}"/>
+                                    </StackPanel.Resources>
+
+                                    <Button ToolTip="{x:Static props:Resources.Text_Update}"
+                                        Command="{Binding DataContext.UpdateGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}">
+                                        <Path Data="{StaticResource ArrowClockwiseIcon}" Fill="White"/>
+                                    </Button>
+                                    <Button ToolTip="{x:Static props:Resources.Text_SendInvite}"
                                         Command="{Binding DataContext.InviteGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        VerticalAlignment="Top" HorizontalAlignment="Right"
-                                        Style="{StaticResource MahApps.Styles.Button.WindowCommands}" Margin="0 7 5 0">
-                                    <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}" Fill="White"/>
-                                </Button>
+                                        CommandParameter="{Binding}">
+                                        <Path Data="{StaticResource InviteIcon}" Fill="White"/>
+                                    </Button>
+                                </StackPanel>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -328,6 +347,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
@@ -504,8 +524,16 @@
 
                     </DataGrid>
 
+                    <!--状態更新ボタン-->
+                    <Button Grid.Row="3" Command="{Binding UpdateAllCommand}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{StaticResource ArrowClockwiseIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
+                            <TextBlock Text="{x:Static props:Resources.Text_Update}" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                        </StackPanel>
+                    </Button>
+
                     <!--Invite実行ボタン-->
-                    <Button Grid.Row="3" Command="{Binding InviteAllCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
+                    <Button Grid.Row="4" Command="{Binding InviteAllCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolInvertToVisibilityConverter}}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Path Data="{StaticResource InviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                             <TextBlock Text="{x:Static props:Resources.Text_SendInvite}" VerticalAlignment="Center" Margin="5 0 0 0"/>
@@ -513,7 +541,7 @@
                     </Button>
 
                     <!--Invite中断ボタン-->
-                    <Button Grid.Row="3" Command="{Binding AbortInviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Button Grid.Row="4" Command="{Binding AbortInviteCommand}" Visibility="{Binding IsInviting, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Path Data="{StaticResource AbortInviteIcon}" Style="{StaticResource ButtonIconPathStyle}"/>
                             <TextBlock VerticalAlignment="Center" Margin="5 0 0 0">
