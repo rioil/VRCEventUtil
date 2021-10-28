@@ -53,12 +53,13 @@ namespace VRCEventUtil.Models.Util
 
         private static byte[] GenerateKey()
         {
-            var key = DeviceIdentificationHelper.GetMacAddress()
-                .Select(addr => addr.GetHashCode())
-                .Aggregate((key, addr) => key ^ addr);
-
+            // WSLの起動有無で値が変わってしまう
+            //var key = DeviceIdentificationHelper.GetMacAddress()
+            //    .Select(addr => addr.GetHashCode())
+            //    .Aggregate((key, addr) => key ^ addr);
+            var key = DeviceIdentificationHelper.GetVolumeNo();
             using var sha = SHA256.Create();
-            var hash = sha.ComputeHash(BitConverter.GetBytes(key));
+            var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(key));
 
             return hash;
         }
