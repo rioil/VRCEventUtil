@@ -701,7 +701,7 @@ namespace VRCEventUtil.Properties {
         ///
         ///「インスタンスを作成」ボタンを押すとインスタンスが作成され自動入力されます．
         ///
-        ///インスタンスURL（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;amp;instanceId=00000~region(jp)）
+        ///インスタンスURL（例：https://vrchat.com/home/launch?worldId=wrld_ba913a96-fac4-4048-a062-9aa5db092812&amp;instanceId=00000~region(jp)）
         ///または，ワールドID:インスタンスID（例：wrld_ba913a96-fac4-4048-a062-9aa5db092812:00000~region(jp)）のいずれかの形式で入力してください． に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Tooltip_LocationIdOrUrl {
