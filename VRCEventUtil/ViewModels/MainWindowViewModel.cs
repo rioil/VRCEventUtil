@@ -22,6 +22,7 @@ using VRCEventUtil.Models.Api;
 using VRCEventUtil.Models.Setting;
 using System.Collections.Specialized;
 using VRCEventUtil.Views;
+using System.IO;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -532,7 +533,9 @@ namespace VRCEventUtil.ViewModels
             var dialog = new OpeningFileSelectionMessage("OpenFileDialog")
             {
                 Title = Resources.Title_SelectUserListFile,
-                Filter = Resources.FileFilter_JSON
+                Filter = Resources.FileFilter_JSON,
+                InitialDirectory = Path.GetDirectoryName(UserListFilePath),
+                FileName = Path.GetFileName(UserListFilePath)
             };
             Messenger.Raise(dialog);
 

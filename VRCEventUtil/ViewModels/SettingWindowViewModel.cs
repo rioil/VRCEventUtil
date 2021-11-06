@@ -11,6 +11,7 @@ using VRCEventUtil.Models;
 using VRCEventUtil.Models.Setting;
 using Livet.Messaging.IO;
 using VRCEventUtil.Properties;
+using System.IO;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -42,7 +43,9 @@ namespace VRCEventUtil.ViewModels
             var dialog = new OpeningFileSelectionMessage("OpenFileDialog")
             {
                 Title = Resources.Title_SelectSteamExeFile,
-                Filter = Resources.FileFilter_Exe
+                Filter = Resources.FileFilter_Exe,
+                InitialDirectory = Path.GetDirectoryName(Settings.SteamExePath),
+                FileName = Path.GetFileName(Settings.SteamExePath)
             };
             Messenger.Raise(dialog);
 
