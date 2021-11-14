@@ -180,20 +180,7 @@ namespace VRCEventUtil.ViewModels
         public string? UserListFilePath
         {
             get => _userListFilePath;
-            set
-            {
-                if (RaisePropertyChangedIfSet(ref _userListFilePath, value) && value is object)
-                {
-                    Task.Run(() =>
-                    {
-                        var inviteUsers = UserListReader.ReadInviteUser(value);
-                        DispatcherHelper.UIDispatcher.Invoke(() =>
-                        {
-                            Users = new ObservableCollection<InviteUser>(inviteUsers);
-                        });
-                    });
-                }
-            }
+            set => RaisePropertyChangedIfSet(ref _userListFilePath, value);
         }
         private string? _userListFilePath;
 
@@ -349,8 +336,7 @@ namespace VRCEventUtil.ViewModels
             }
             else
             {
-                Messenger.Raise(new InformationMessage(Resources.Fail_LogIn,
-                    Resources.Title_Error, MessageBoxImage.Warning, "InformationMessage"));
+                ShowWarning(Resources.Fail_LogIn);
             }
 
             Password = string.Empty;
@@ -490,8 +476,7 @@ namespace VRCEventUtil.ViewModels
             if (!ApiUtil.TryParseWorldId(WorldIdOrUrl, out var worldId))
             {
                 Log(Resources.Error_InvalidWorldIdOrUrl);
-                Messenger.Raise(new InformationMessage(Resources.Error_InvalidWorldIdOrUrl, Resources.Title_Error,
-                    MessageBoxImage.Warning, "InformationMessage"));
+                ShowWarning(Resources.Error_InvalidWorldIdOrUrl);
                 return;
             }
 
@@ -502,8 +487,7 @@ namespace VRCEventUtil.ViewModels
             catch (FormatException)
             {
                 Log(Resources.Error_InvalidWorldIdOrUrl);
-                Messenger.Raise(new InformationMessage(Resources.Error_InvalidWorldIdOrUrl, Resources.Title_Error,
-                    MessageBoxImage.Warning, "InformationMessage"));
+                ShowWarning(Resources.Error_InvalidWorldIdOrUrl);
                 return;
             }
             catch (OperationCanceledException)
@@ -542,6 +526,19 @@ namespace VRCEventUtil.ViewModels
             if (dialog.Response is object && dialog.Response.Any())
             {
                 UserListFilePath = dialog.Response[0];
+
+                if (UserListFilePath is object)
+                {
+                    try
+                    {
+                        var inviteUsers = UserListReader.ReadInviteUser(UserListFilePath);
+                        Users = new ObservableCollection<InviteUser>(inviteUsers);
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowWarning(ex.Message);
+                    }
+                }
             }
         }
         private ViewModelCommand? _selectUserListFileCommand;
@@ -562,16 +559,14 @@ namespace VRCEventUtil.ViewModels
             if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
             {
                 Log(Resources.Error_InvalidLocationIdOrUrl);
-                Messenger.Raise(new InformationMessage(Resources.Error_InvalidLocationIdOrUrl, Resources.Title_Error,
-                    MessageBoxImage.Warning, "InformationMessage"));
+                ShowWarning(Resources.Error_InvalidLocationIdOrUrl);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(SettingManager.Settings.SteamExePath))
             {
                 Log(Resources.Error_EmptySteamExePath);
-                Messenger.Raise(new InformationMessage(Resources.Error_EmptySteamExePath, Resources.Title_Error,
-                    MessageBoxImage.Warning, "InformationMessage"));
+                ShowWarning(Resources.Error_EmptySteamExePath);
                 return;
             }
 
@@ -683,6 +678,15 @@ namespace VRCEventUtil.ViewModels
             var tmp = msg?.ToString();
             if (tmp is null) { return; }
             Log(tmp);
+        }
+
+        /// <summary>
+        /// 警告ダイアログを表示します．
+        /// </summary>
+        /// <param name="message">メッセージ内容</param>
+        private void ShowWarning(string message)
+        {
+            Messenger.Raise(new InformationMessage(message, Resources.Title_Error, MessageBoxImage.Warning, "InformationMessage"));
         }
         #endregion 内部関数
     }
