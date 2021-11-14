@@ -12,6 +12,8 @@
         Height="500" Width="400"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
+        WindowTransitionsEnabled="False"
+        ShowCloseButton="False"
         Icon="/VRCEventUtil;component/Resources/settings_white.png">
     
     <mah:MetroWindow.IconTemplate>
@@ -91,7 +93,7 @@
                     <mah:MetroHeader Header="{x:Static props:Resources.Text_APICallIntervalSec}">
                         <DockPanel>
                             <mah:NumericUpDown Value="{Binding Settings.ApiCallIntervalSec}" Minimum="0" Maximum="60"
-                                               DockPanel.Dock="Right" Margin="5 0 0 0" VerticalContentAlignment="Center"/>
+                                               DockPanel.Dock="Right" Margin="5 0 0 0" VerticalContentAlignment="Center" SwitchUpDownButtons="True"/>
                             <Slider Value="{Binding Settings.ApiCallIntervalSec}" TickPlacement="BottomRight"
                                     Minimum="0" Maximum="60"/>
                         </DockPanel>
