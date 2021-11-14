@@ -445,6 +445,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   ログイン中… に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Text_LoggingIn {
+            get {
+                return ResourceManager.GetString("Text_LoggingIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ログイン に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Text_Login {
