@@ -12,6 +12,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace VRCEventUtil.Models.Util
 {
+    /// <summary>
+    /// 更新の確認を行うクラス
+    /// </summary>
     internal class UpdateChecker
     {
         public UpdateChecker()
@@ -22,7 +25,7 @@ namespace VRCEventUtil.Models.Util
         }
 
         public Version Current { get; }
-        public Version Latest { get; private set; } = new Version();
+        public Version Latest { get; private set; } = new Version(0, 0, 0);
 
         public async Task<bool> Check()
         {
@@ -43,6 +46,11 @@ namespace VRCEventUtil.Models.Util
             return Latest > Current;
         }
 
+        /// <summary>
+        /// バージョン文字列を*.*.*形式のバージョンとして解析します．先頭のvは無視されます．
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
         private static Version ParseVersion(string version)
         {
             var versions = version.TrimStart('v').Split('.');
@@ -50,7 +58,6 @@ namespace VRCEventUtil.Models.Util
             int major;
             int minor;
             int build;
-            int revision;
 
             if (versions.Length == 0)
             {
@@ -60,23 +67,17 @@ namespace VRCEventUtil.Models.Util
 
             if (version.Length == 1)
             {
-                return new Version(major, 0);
+                return new Version(major, 0, 0);
             }
             minor = int.Parse(versions[1]);
 
             if (version.Length == 2)
             {
-                return new Version(minor, minor);
+                return new Version(minor, minor, 0);
             }
             build = int.Parse(versions[2]);
 
-            if (version.Length == 3)
-            {
-                return new Version(major, minor, build);
-            }
-
-            revision = int.Parse(versions[3]);
-            return new Version(major, minor, build, revision);
+            return new Version(major, minor, build);
         }
     }
 }
