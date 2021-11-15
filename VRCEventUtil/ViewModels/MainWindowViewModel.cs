@@ -23,6 +23,7 @@ using VRCEventUtil.Models.Setting;
 using System.Collections.Specialized;
 using VRCEventUtil.Views;
 using System.IO;
+using VRCEventUtil.Models.Util;
 
 namespace VRCEventUtil.ViewModels
 {
@@ -32,7 +33,6 @@ namespace VRCEventUtil.ViewModels
         public async void Initialize()
         {
             IsLoading = true;
-            Users = new ObservableCollection<InviteUser>();
             SettingManager.LoadSetting();
 
             Username = Settings.Default.Username;
@@ -50,6 +50,12 @@ namespace VRCEventUtil.ViewModels
                 }
             }
             IsLoading = false;
+
+            var checker = new UpdateChecker();
+            if (await checker.Check())
+            {
+                ShowInformation($"更新があります．\n現在のバージョン：{checker.Current}\n新しいバージョン：{checker.Latest}");
+            }
         }
 
         #region メンバ変数
@@ -245,7 +251,7 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private ObservableCollection<InviteUser> _users = default!;
+        private ObservableCollection<InviteUser> _users = new ObservableCollection<InviteUser>();
 
         /// <summary>
         /// グループリスト
@@ -687,6 +693,15 @@ namespace VRCEventUtil.ViewModels
         private void ShowWarning(string message)
         {
             Messenger.Raise(new InformationMessage(message, Resources.Title_Error, MessageBoxImage.Warning, "InformationMessage"));
+        }
+
+        /// <summary>
+        /// 確認ダイアログを表示します．
+        /// </summary>
+        /// <param name="message">メッセージ内容</param>
+        private void ShowInformation(string message)
+        {
+            Messenger.Raise(new InformationMessage(message, Resources.Title_Confirm, MessageBoxImage.Information, "InformationMessage"));
         }
         #endregion 内部関数
     }
