@@ -1,14 +1,10 @@
 ﻿using Octokit;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Reflection;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Diagnostics.CodeAnalysis;
+using VRCEventUtil.Models.Setting;
 
 namespace VRCEventUtil.Models.Util
 {
@@ -17,8 +13,11 @@ namespace VRCEventUtil.Models.Util
     /// </summary>
     internal class UpdateChecker
     {
-        public UpdateChecker()
+        public UpdateChecker(string repoOwner, string repoName)
         {
+            RepoOwner = repoOwner;
+            RepoName = repoName;
+
             var assembly = Assembly.GetExecutingAssembly();
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
             var fileVersion = info.FileVersion;
@@ -32,16 +31,27 @@ namespace VRCEventUtil.Models.Util
             }
         }
 
+        public string RepoOwner { get; }
+        public string RepoName { get; }
         public Version Current { get; }
         public Version Latest { get; private set; } = new Version(0, 0, 0);
 
         public async Task<bool> Check()
         {
-            var github = new GitHubClient(new ProductHeaderValue("VRCEventUtil"));
+            var github = new GitHubClient(new ProductHeaderValue(RepoName));
             Release release;
             try
             {
-                release = await github.Repository.Release.GetLatest("rioil", "VRCEventUtil");
+                if (SettingManager.Settings.CheckPreRelease)
+                {
+                    var releases = await github.Repository.Release.GetAll(RepoOwner, RepoName);
+                    if (!releases.Any()) { return false; }
+                    release = releases[0];
+                }
+                else
+                {
+                    release = await github.Repository.Release.GetLatest(RepoOwner, RepoName);
+                }
             }
             catch (NotFoundException) { return false; }
             catch (ApiException ex)

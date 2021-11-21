@@ -216,6 +216,9 @@
   <data name="Text_Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
+  <data name="Text_CheckPreRelase" xml:space="preserve">
+    <value>プレリリースを更新確認対象に含める</value>
+  </data>
   <data name="Text_ClearLog" xml:space="preserve">
     <value>ログをクリア</value>
   </data>

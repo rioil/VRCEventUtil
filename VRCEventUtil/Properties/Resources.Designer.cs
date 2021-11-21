@@ -346,6 +346,15 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
+        ///   プレリリースを更新確認対象に含める に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Text_CheckPreRelase {
+            get {
+                return ResourceManager.GetString("Text_CheckPreRelase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ログをクリア に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Text_ClearLog {

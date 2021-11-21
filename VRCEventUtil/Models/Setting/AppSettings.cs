@@ -50,6 +50,16 @@ namespace VRCEventUtil.Models.Setting
         private int _apiCallIntervalSec = 1;
 
         /// <summary>
+        /// PreReleaseをアップデート確認に含めるか
+        /// </summary>
+        public bool CheckPreRelease
+        {
+            get => _checkPreRelease;
+            set => RaisePropertyChangedIfSet(ref _checkPreRelease, value);
+        }
+        private bool _checkPreRelease;
+
+        /// <summary>
         /// SteamのEXEファイルのパス
         /// </summary>
         public string? SteamExePath

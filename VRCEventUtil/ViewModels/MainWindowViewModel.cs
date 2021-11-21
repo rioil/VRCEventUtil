@@ -51,7 +51,7 @@ namespace VRCEventUtil.ViewModels
             }
             IsLoading = false;
 
-            var checker = new UpdateChecker();
+            var checker = new UpdateChecker("rioil", "VRCEventUtil");
             if (await checker.Check())
             {
                 ShowInformation($"更新があります．\n現在のバージョン：{checker.Current}\n新しいバージョン：{checker.Latest}");

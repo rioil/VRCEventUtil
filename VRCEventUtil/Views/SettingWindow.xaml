@@ -98,6 +98,9 @@
                                     Minimum="0" Maximum="60"/>
                         </DockPanel>
                     </mah:MetroHeader>
+
+                    <mah:ToggleSwitch IsOn="{Binding Settings.CheckPreRelease}" Content="{x:Static props:Resources.Text_CheckPreRelase}"
+                                      Margin="0 0 0 5"/>
                 </StackPanel>
             </GroupBox>
 
