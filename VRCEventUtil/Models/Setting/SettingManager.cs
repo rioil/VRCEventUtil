@@ -34,7 +34,7 @@ namespace VRCEventUtil.Models.Setting
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     WriteIndented = true
                 };
-                Settings = JsonSerializer.Deserialize<AppSettings>(json, options);
+                Settings = JsonSerializer.Deserialize<AppSettings>(json, options) ?? new AppSettings();
             }
             catch (Exception ex)
             {
@@ -106,8 +106,7 @@ namespace VRCEventUtil.Models.Setting
 
             try
             {
-                var command = Registry.GetValue(@"HKEY_CLASSES_ROOT\steam\Shell\Open\Command", null, null) as string;
-                if (command is object)
+                if (Registry.GetValue(@"HKEY_CLASSES_ROOT\steam\Shell\Open\Command", null, null) is string command)
                 {
                     path = Regex.Matches(command, @"(?<="")[^""]*(?="")").FirstOrDefault()?.Value;
                 }

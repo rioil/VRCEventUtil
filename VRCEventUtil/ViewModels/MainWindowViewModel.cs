@@ -158,7 +158,7 @@ namespace VRCEventUtil.ViewModels
             get => _logs;
             set => RaisePropertyChangedIfSet(ref _logs, value);
         }
-        private ObservableCollection<UserLog> _logs = new ObservableCollection<UserLog>();
+        private ObservableCollection<UserLog> _logs = new();
 
         /// <summary>
         /// ログイン済みか
@@ -209,6 +209,7 @@ namespace VRCEventUtil.ViewModels
                         switch (args.Action)
                         {
                             case NotifyCollectionChangedAction.Add:
+                                if (args.NewItems is null) { break; }
                                 foreach (var user in args.NewItems.Cast<InviteUser>())
                                 {
                                     var group = Groups.FirstOrDefault(g => g.GroupName == user.GroupName);
@@ -224,10 +225,11 @@ namespace VRCEventUtil.ViewModels
                                 }
                                 break;
                             case NotifyCollectionChangedAction.Remove:
+                                if (args.OldItems is null) { break; }
                                 foreach (var user in args.OldItems.Cast<InviteUser>())
                                 {
                                     var group = Groups.FirstOrDefault(g => g.GroupName == user.GroupName);
-                                    if (group is object)
+                                    if (group is not null)
                                     {
                                         group.Users.Remove(user);
                                     }
@@ -237,9 +239,9 @@ namespace VRCEventUtil.ViewModels
                                 UpdateGruop();
                                 break;
                             case NotifyCollectionChangedAction.Replace:
-                                var oldUser = args.OldItems.Cast<InviteUser>().FirstOrDefault();
-                                var newUser = args.NewItems.Cast<InviteUser>().FirstOrDefault();
-                                if (oldUser == newUser) { break; }
+                                var oldUser = args.OldItems?.Cast<InviteUser>().FirstOrDefault();
+                                var newUser = args.NewItems?.Cast<InviteUser>().FirstOrDefault();
+                                if (oldUser is null || newUser is null || oldUser == newUser) { break; }
                                 Groups.FirstOrDefault(g => g.GroupName == oldUser.GroupName)?.Users.Remove(oldUser);
                                 Groups.FirstOrDefault(g => g.GroupName == newUser.GroupName)?.Users.Add(newUser);
                                 break;
@@ -251,7 +253,7 @@ namespace VRCEventUtil.ViewModels
                 }
             }
         }
-        private ObservableCollection<InviteUser> _users = new ObservableCollection<InviteUser>();
+        private ObservableCollection<InviteUser> _users = new();
 
         /// <summary>
         /// グループリスト
@@ -261,7 +263,7 @@ namespace VRCEventUtil.ViewModels
             get => _groups;
             set => RaisePropertyChangedIfSet(ref _groups, value);
         }
-        private ObservableCollection<UserGroup> _groups = new ObservableCollection<UserGroup>();
+        private ObservableCollection<UserGroup> _groups = new();
 
         /// <summary>
         /// インスタンスの公開範囲
@@ -410,7 +412,7 @@ namespace VRCEventUtil.ViewModels
             Invite(new InviteUser[] { user });
         }
 
-        public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(LocationIdOrUrl) && Users is object && Users.Any();
+        public bool CanInvite() => !IsInviting && !string.IsNullOrWhiteSpace(LocationIdOrUrl) && Users is not null && Users.Any();
 
         private ViewModelCommand? _inviteAllCommand;
         public ViewModelCommand InviteAllCommand => _inviteAllCommand ??= new ViewModelCommand(() => Invite(Users), CanInvite);
@@ -437,14 +439,20 @@ namespace VRCEventUtil.ViewModels
         #region 情報更新コマンド
         public async void Update(InviteUser user)
         {
-            ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId);
+            if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
+            {
+                return;
+            }
 
             await ApiManager.Instance.UpdateUserStatus(user, locationId);
         }
 
         public async void Update(UserGroup group)
         {
-            ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId);
+            if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
+            {
+                return;
+            }
 
             foreach (var user in group.Users)
             {
@@ -454,7 +462,10 @@ namespace VRCEventUtil.ViewModels
 
         public async void Update()
         {
-            ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId);
+            if (!ApiUtil.TryParseLocationIdOrUrl(LocationIdOrUrl, out var locationId))
+            {
+                return;
+            }
 
             foreach (var user in Users)
             {
@@ -462,7 +473,7 @@ namespace VRCEventUtil.ViewModels
             }
         }
 
-        public bool CanUpdate() => Users is object && Users.Any();  // TODO
+        public bool CanUpdate() => Users is not null && Users.Any();  // TODO
 
         private ViewModelCommand? _updateAllCommand;
         public ViewModelCommand UpdateAllCommand => _updateAllCommand ??= new ViewModelCommand(Update, CanUpdate);
@@ -529,11 +540,11 @@ namespace VRCEventUtil.ViewModels
             };
             Messenger.Raise(dialog);
 
-            if (dialog.Response is object && dialog.Response.Any())
+            if (dialog.Response is not null && dialog.Response.Any())
             {
                 UserListFilePath = dialog.Response[0];
 
-                if (UserListFilePath is object)
+                if (UserListFilePath is not null)
                 {
                     try
                     {

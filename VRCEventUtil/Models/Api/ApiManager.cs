@@ -16,10 +16,11 @@ using System.ComponentModel;
 using VRCEventUtil.Converters;
 using VRCEventUtil.Models.Setting;
 using VRCEventUtil.Properties;
+using static VRCEventUtil.Models.Api.ApiUtil;
 
 namespace VRCEventUtil.Models.Api
 {
-    public class ApiManager : IDisposable
+    public class ApiManager
     {
         #region 定数
         //private const string API_BASE_ADDRESS = "https://api.vrchat.cloud/v1";
@@ -27,9 +28,9 @@ namespace VRCEventUtil.Models.Api
         #endregion 定数
 
         #region メンバ変数
-        private readonly BlockingCollection<CountdownEvent> _apiCallRequests = new BlockingCollection<CountdownEvent>();
-        private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
-        private AuthenticationApi _authApi = new AuthenticationApi();
+        private readonly BlockingCollection<CountdownEvent> _apiCallRequests = new();
+        private readonly CancellationTokenSource _tokenSource = new();
+        private AuthenticationApi _authApi = new();
         private DateTime _lastApiCallTime;
         #endregion メンバ変数
 
@@ -46,7 +47,7 @@ namespace VRCEventUtil.Models.Api
                     if (_apiCallRequests.Any())
                     {
                         var interval = DateTime.Now - _lastApiCallTime;
-                        Logger.Log($"スレッド{Thread.CurrentThread.ManagedThreadId}:前回のAPI呼び出しからの経過時間は{interval}です．");
+                        Logger.Log($"スレッド{Environment.CurrentManagedThreadId}:前回のAPI呼び出しからの経過時間は{interval}です．");
 
                         TimeSpan MIN_INTERVAL = TimeSpan.FromSeconds(SettingManager.Settings.ApiCallIntervalSec);
                         if (interval < MIN_INTERVAL)
@@ -56,14 +57,15 @@ namespace VRCEventUtil.Models.Api
 
                         _apiCallRequests.Take().Signal();
                         _lastApiCallTime = DateTime.Now;
-                        Logger.Log($"スレッド{Thread.CurrentThread.ManagedThreadId}:{_lastApiCallTime}にAPI呼び出しを許可しました．");
+                        Logger.Log($"スレッド{Environment.CurrentManagedThreadId}:{_lastApiCallTime}にAPI呼び出しを許可しました．");
                     }
 
                     await Task.Delay(1);
                 }
             }, token);
         }
-        public void Dispose()
+
+        ~ApiManager()
         {
             _tokenSource?.Cancel();
         }
@@ -303,7 +305,7 @@ namespace VRCEventUtil.Models.Api
 
             try
             {
-                (worldId, instanceId) = ApiUtil.ResolveLocationIdOrUrl(locationId);
+                (worldId, instanceId) = ResolveLocationIdOrUrl(locationId);
             }
             catch (FormatException ex)
             {
@@ -403,46 +405,8 @@ namespace VRCEventUtil.Models.Api
             var authCookie = cookies["auth"];
             var mfaCookie = cookies["twoFactorAuth"];
 
-            AuthCookieManager.AuthCookie = authCookie.Value;
-            AuthCookieManager.MFACookie = mfaCookie.Value;
-        }
-
-        /// <summary>
-        /// 新しいLocation IDを作成します．
-        /// </summary>
-        /// <param name="worldId"></param>
-        /// <param name="userId"></param>
-        /// <param name="region"></param>
-        /// <param name="disclosureRange"></param>
-        /// <returns></returns>
-        private string CreateNewLocationId(string worldId, string userId, ERegion region, EDisclosureRange disclosureRange)
-        {
-            // :(\d+)(~region\(([\w]+)\))?(~([\w]+)\(usr_([\w-]+)\)((\~canRequestInvite)?)(~region\(([\w].+)\))?~nonce\((.+)\))?
-            var random = new Random();
-            var instanceId = random.Next(10000, 99999);
-            string disclosureRangeStr = string.Empty;
-            switch (disclosureRange)
-            {
-                case EDisclosureRange.FriendsPlus:
-                    disclosureRangeStr = $"~hidden({userId})";
-                    break;
-                case EDisclosureRange.Friends:
-                    disclosureRangeStr = $"~friends({userId})";
-                    break;
-                case EDisclosureRange.InvitePlus:
-                    disclosureRangeStr = $"~private({userId})~canRequestInvite";
-                    break;
-                case EDisclosureRange.Invite:
-                    disclosureRangeStr = $"~private({userId})";
-                    break;
-            }
-
-            string regionStr = $"~region({region.ToString().ToLower()})";
-            string nonce = $"~nonce({Guid.NewGuid()})";
-
-            var location = $"{worldId}:{instanceId}{disclosureRangeStr}{regionStr}{nonce}";
-
-            return location;
+            AuthCookieManager.AuthCookie = authCookie?.Value ?? string.Empty;
+            AuthCookieManager.MFACookie = mfaCookie?.Value ?? string.Empty;
         }
 
         /// <summary>

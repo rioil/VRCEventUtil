@@ -65,7 +65,7 @@ namespace VRCEventUtil.Models
             var instances = new ObservableCollection<WorldInstance>();
             foreach (var instance in info.Instances)
             {
-                var instanceId = instance.FirstOrDefault().ToString();
+                var instanceId = instance.FirstOrDefault()?.ToString();
                 if (instanceId is null) { continue; }
                 instances.Add(new WorldInstance(worldId, instanceId));
             }

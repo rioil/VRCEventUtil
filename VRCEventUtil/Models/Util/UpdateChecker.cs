@@ -21,7 +21,15 @@ namespace VRCEventUtil.Models.Util
         {
             var assembly = Assembly.GetExecutingAssembly();
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
-            Current = ParseVersion(info.FileVersion);
+            var fileVersion = info.FileVersion;
+            if (fileVersion is null)
+            {
+                Current = new Version(0, 0, 0);
+            }
+            else
+            {
+                Current = ParseVersion(fileVersion);
+            }
         }
 
         public Version Current { get; }

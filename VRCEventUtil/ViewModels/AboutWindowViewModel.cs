@@ -17,7 +17,7 @@ namespace VRCEventUtil.ViewModels
             AppName = assembly.GetName().Name ?? MISSING_INFO;
             //AssemblyVersion = assembly.GetName().Version?.ToString() ?? MISSING_INFO;
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
-            FileVersion = info.FileVersion;
+            FileVersion = info.FileVersion ?? MISSING_INFO;
         }
 
         /// <summary>

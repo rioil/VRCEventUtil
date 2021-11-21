@@ -13,7 +13,7 @@ namespace VRCEventUtil.Converters
     {
         public EnumDisplayNameConverter(Type type) : base(type) { }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
         {
             if (value is Enum eVal)
             {
@@ -70,6 +70,7 @@ namespace VRCEventUtil.Converters
     //    }
     //}
 
+    [AttributeUsage(AttributeTargets.Field)]
     public class EnumDisplayNameAttribute : Attribute
     {
         public EnumDisplayNameAttribute(string displayName)

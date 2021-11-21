@@ -29,14 +29,16 @@ namespace VRCEventUtil.Models.UserList
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true
             };
-            
+
             try
             {
-                var records = JsonSerializer.Deserialize<InviteUser[]>(File.ReadAllText(filePath), options).ToList();
+                var records = JsonSerializer.Deserialize<InviteUser[]>(File.ReadAllText(filePath), options)?.ToList();
+                if (records is null) { return new List<InviteUser>(); }
+
                 var uniqueRecords = records.Distinct(new InviteUserComparer()).ToList();
                 if (records.Count != uniqueRecords.Count)
                 {
-                    Logger.Log($"ユーザーリストファイル {filePath} 読み込み時に，{records.Count() - uniqueRecords.Count}件の重複データを削除しました．");
+                    Logger.Log($"ユーザーリストファイル {filePath} 読み込み時に，{records.Count - uniqueRecords.Count}件の重複データを削除しました．");
                 }
 
                 return uniqueRecords;

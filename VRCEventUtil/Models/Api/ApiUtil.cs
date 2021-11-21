@@ -152,7 +152,7 @@ namespace VRCEventUtil.Models.Api
         /// <param name="worldIdOrUrl"></param>
         /// <returns></returns>
         /// <exception cref="FormatException"></exception>
-        public static string ParseWorldId(string? worldIdOrUrl)
+        public static string ParseWorldId(string worldIdOrUrl)
         {
             if (Regex.IsMatch(worldIdOrUrl, WORLD_ID_PATTERN))
             {
@@ -210,6 +210,44 @@ namespace VRCEventUtil.Models.Api
             if (Regex.IsMatch(worldIdOrUrl, WORLD_URL_PATTERN)) { return true; }
 
             return false;
+        }
+
+        /// <summary>
+        /// 新しいLocation IDを作成します．
+        /// </summary>
+        /// <param name="worldId"></param>
+        /// <param name="userId"></param>
+        /// <param name="region"></param>
+        /// <param name="disclosureRange"></param>
+        /// <returns></returns>
+        public static string CreateNewLocationId(string worldId, string userId, ERegion region, EDisclosureRange disclosureRange)
+        {
+            // :(\d+)(~region\(([\w]+)\))?(~([\w]+)\(usr_([\w-]+)\)((\~canRequestInvite)?)(~region\(([\w].+)\))?~nonce\((.+)\))?
+            var random = new Random();
+            var instanceId = random.Next(10000, 99999);
+            string disclosureRangeStr = string.Empty;
+            switch (disclosureRange)
+            {
+                case EDisclosureRange.FriendsPlus:
+                    disclosureRangeStr = $"~hidden({userId})";
+                    break;
+                case EDisclosureRange.Friends:
+                    disclosureRangeStr = $"~friends({userId})";
+                    break;
+                case EDisclosureRange.InvitePlus:
+                    disclosureRangeStr = $"~private({userId})~canRequestInvite";
+                    break;
+                case EDisclosureRange.Invite:
+                    disclosureRangeStr = $"~private({userId})";
+                    break;
+            }
+
+            string regionStr = $"~region({region.ToString().ToLower()})";
+            string nonce = $"~nonce({Guid.NewGuid()})";
+
+            var location = $"{worldId}:{instanceId}{disclosureRangeStr}{regionStr}{nonce}";
+
+            return location;
         }
     }
 }
