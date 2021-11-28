@@ -207,8 +207,8 @@
   <data name="Text_AbortInvite" xml:space="preserve">
     <value>Invite送信を中断</value>
   </data>
-  <data name="Text_APICallIntervalSec" xml:space="preserve">
-    <value>API呼び出し最小間隔（秒）</value>
+  <data name="Text_APICallInterval" xml:space="preserve">
+    <value>API呼び出し最小間隔</value>
   </data>
   <data name="Text_Authentication" xml:space="preserve">
     <value>認証</value>

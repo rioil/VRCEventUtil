@@ -319,11 +319,11 @@ namespace VRCEventUtil.Properties {
         }
         
         /// <summary>
-        ///   API呼び出し最小間隔（秒） に類似しているローカライズされた文字列を検索します。
+        ///   API呼び出し最小間隔 に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string Text_APICallIntervalSec {
+        public static string Text_APICallInterval {
             get {
-                return ResourceManager.GetString("Text_APICallIntervalSec", resourceCulture);
+                return ResourceManager.GetString("Text_APICallInterval", resourceCulture);
             }
         }
         

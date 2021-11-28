@@ -36,18 +36,18 @@ namespace VRCEventUtil.Models.Setting
         /// <summary>
         /// API呼び出しの最小間隔（秒）
         /// </summary>
-        public int ApiCallIntervalSec
+        public TimeSpan ApiCallInterval
         {
-            get => _apiCallIntervalSec;
+            get => _apiCallInterval;
             set
             {
-                if (RaisePropertyChangedIfSet(ref _apiCallIntervalSec, value, nameof(ApiCallIntervalSec)))
+                if (RaisePropertyChangedIfSet(ref _apiCallInterval, value, nameof(ApiCallInterval)))
                 {
                     IsChanged = true;
                 }
             }
         }
-        private int _apiCallIntervalSec = 1;
+        private TimeSpan _apiCallInterval = TimeSpan.FromSeconds(1);
 
         /// <summary>
         /// PreReleaseをアップデート確認に含めるか

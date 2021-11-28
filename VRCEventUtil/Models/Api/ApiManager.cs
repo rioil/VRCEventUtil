@@ -49,7 +49,7 @@ namespace VRCEventUtil.Models.Api
                         var interval = DateTime.Now - _lastApiCallTime;
                         Logger.Log($"スレッド{Environment.CurrentManagedThreadId}:前回のAPI呼び出しからの経過時間は{interval}です．");
 
-                        TimeSpan MIN_INTERVAL = TimeSpan.FromSeconds(SettingManager.Settings.ApiCallIntervalSec);
+                        TimeSpan MIN_INTERVAL = SettingManager.Settings.ApiCallInterval;
                         if (interval < MIN_INTERVAL)
                         {
                             await Task.Delay(MIN_INTERVAL - interval);

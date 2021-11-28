@@ -6,8 +6,8 @@
         xmlns:v="clr-namespace:VRCEventUtil.Views"
         xmlns:vm="clr-namespace:VRCEventUtil.ViewModels"
         xmlns:props="clr-namespace:VRCEventUtil.Properties"
+        xmlns:ctrl="clr-namespace:VRCEventUtil.Controls"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         Title="{x:Static props:Resources.Text_Setting}"
         Height="500" Width="400"
         ResizeMode="NoResize"
@@ -15,7 +15,7 @@
         WindowTransitionsEnabled="False"
         ShowCloseButton="False"
         Icon="/VRCEventUtil;component/Resources/settings_white.png">
-    
+
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
             <!-- Setting a Margin and enable hight-quality image -->
@@ -88,18 +88,24 @@
 
             <GroupBox Header="{x:Static props:Resources.Text_General}">
                 <StackPanel>
-                    <mah:ToggleSwitch IsOn="{Binding Settings.SaveAuthCookies}" Content="{x:Static props:Resources.Text_SaveAuthCookies}"
+                    <mah:ToggleSwitch IsOn="{Binding Settings.SaveAuthCookies}"
+                                      Content="{x:Static props:Resources.Text_SaveAuthCookies}"
                                       Margin="0 0 0 5"/>
-                    <mah:MetroHeader Header="{x:Static props:Resources.Text_APICallIntervalSec}">
+                    <!--<mah:MetroHeader Header="{x:Static props:Resources.Text_APICallIntervalSec}">
                         <DockPanel>
                             <mah:NumericUpDown Value="{Binding Settings.ApiCallIntervalSec}" Minimum="0" Maximum="60"
                                                DockPanel.Dock="Right" Margin="5 0 0 0" VerticalContentAlignment="Center" SwitchUpDownButtons="True"/>
                             <Slider Value="{Binding Settings.ApiCallIntervalSec}" TickPlacement="BottomRight"
                                     Minimum="0" Maximum="60"/>
                         </DockPanel>
+                    </mah:MetroHeader>-->
+                    
+                    <mah:MetroHeader Header="{x:Static props:Resources.Text_APICallInterval}">
+                        <ctrl:TimeSpanInputBox Time="{Binding Settings.ApiCallInterval}"/>
                     </mah:MetroHeader>
 
-                    <mah:ToggleSwitch IsOn="{Binding Settings.CheckPreRelease}" Content="{x:Static props:Resources.Text_CheckPreRelase}"
+                    <mah:ToggleSwitch IsOn="{Binding Settings.CheckPreRelease}"
+                                      Content="{x:Static props:Resources.Text_CheckPreRelase}"
                                       Margin="0 0 0 5"/>
                 </StackPanel>
             </GroupBox>
